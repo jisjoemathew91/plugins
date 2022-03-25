@@ -199,19 +199,48 @@ class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
   }
 }
 
-class _RemoteVideo extends StatelessWidget {
+class _RemoteVideo extends StatefulWidget {
   const _RemoteVideo({Key? key}) : super(key: key);
 
   @override
+  State<_RemoteVideo> createState() => _RemoteVideoState();
+}
+
+class _RemoteVideoState extends State<_RemoteVideo> {
+  List<bool> isSelected = [true, false];
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        _BumbleBeeRemoteVideo(),
-        const SizedBox(
-          height: 20,
-        ),
-        const _BigBuckBunnyVideo(),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      child: Column(
+        children: [
+          ToggleButtons(
+            children: const <Widget>[
+              Text('MP4'),
+              Text('HLS'),
+            ],
+            onPressed: (int index) {
+              setState(() {
+                for (int buttonIndex = 0;
+                    buttonIndex < isSelected.length;
+                    buttonIndex++) {
+                  if (buttonIndex == index) {
+                    isSelected[buttonIndex] = true;
+                  } else {
+                    isSelected[buttonIndex] = false;
+                  }
+                }
+              });
+            },
+            isSelected: isSelected,
+          ),
+          if (isSelected[0])
+            _BumbleBeeRemoteVideo()
+          else
+            const _BigBuckBunnyVideo(),
+        ],
+      ),
     );
   }
 }
@@ -257,8 +286,6 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Container(padding: const EdgeInsets.only(top: 20.0)),
-        const Text('With remote mp4'),
         Container(
           padding: const EdgeInsets.all(20),
           child: AspectRatio(
@@ -315,10 +342,6 @@ class _BigBuckBunnyVideoState extends State<_BigBuckBunnyVideo> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Container(
-          padding: const EdgeInsets.only(top: 20.0),
-        ),
-        const Text('With remote hls'),
         Container(
           padding: const EdgeInsets.all(20),
           child: AspectRatio(
