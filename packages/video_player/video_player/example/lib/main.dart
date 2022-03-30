@@ -6,7 +6,6 @@
 
 /// An example of using the plugin, controlling lifecycle and playback of the
 /// video.
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -56,7 +55,7 @@ class _App extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            _BumbleBeeRemoteVideo(),
+            const _RemoteVideo(),
             _ButterFlyAssetVideo(),
             _ButterFlyAssetVideoInList(),
           ],
@@ -200,6 +199,52 @@ class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
   }
 }
 
+class _RemoteVideo extends StatefulWidget {
+  const _RemoteVideo({Key? key}) : super(key: key);
+
+  @override
+  State<_RemoteVideo> createState() => _RemoteVideoState();
+}
+
+class _RemoteVideoState extends State<_RemoteVideo> {
+  List<bool> isSelected = [true, false];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      child: Column(
+        children: [
+          ToggleButtons(
+            children: const <Widget>[
+              Text('MP4'),
+              Text('HLS'),
+            ],
+            onPressed: (int index) {
+              setState(() {
+                for (int buttonIndex = 0;
+                    buttonIndex < isSelected.length;
+                    buttonIndex++) {
+                  if (buttonIndex == index) {
+                    isSelected[buttonIndex] = true;
+                  } else {
+                    isSelected[buttonIndex] = false;
+                  }
+                }
+              });
+            },
+            isSelected: isSelected,
+          ),
+          if (isSelected[0])
+            _BumbleBeeRemoteVideo()
+          else
+            const _BigBuckBunnyVideo(),
+        ],
+      ),
+    );
+  }
+}
+
 class _BumbleBeeRemoteVideo extends StatefulWidget {
   @override
   _BumbleBeeRemoteVideoState createState() => _BumbleBeeRemoteVideoState();
@@ -239,28 +284,79 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Container(padding: const EdgeInsets.only(top: 20.0)),
-          const Text('With remote mp4'),
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  VideoPlayer(_controller),
-                  ClosedCaption(text: _controller.value.caption.text),
-                  _ControlsOverlay(controller: _controller),
-                  VideoProgressIndicator(_controller, allowScrubbing: true),
-                ],
-              ),
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                VideoPlayer(_controller),
+                ClosedCaption(text: _controller.value.caption.text),
+                _ControlsOverlay(controller: _controller),
+                VideoProgressIndicator(_controller, allowScrubbing: true),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BigBuckBunnyVideo extends StatefulWidget {
+  const _BigBuckBunnyVideo({Key? key}) : super(key: key);
+
+  @override
+  _BigBuckBunnyVideoState createState() => _BigBuckBunnyVideoState();
+}
+
+class _BigBuckBunnyVideoState extends State<_BigBuckBunnyVideo> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(
+      'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
+      formatHint: VideoFormat.hls,
+      videoPlayerOptions: VideoPlayerOptions(),
+    );
+
+    _controller.addListener(() {
+      setState(() {});
+    });
+    _controller.setLooping(true);
+    _controller.initialize().then((_) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                VideoPlayer(_controller),
+                _ControlsOverlay(controller: _controller),
+                VideoProgressIndicator(_controller, allowScrubbing: true),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -377,8 +473,23 @@ class _ControlsOverlay extends StatelessWidget {
             ),
           ),
         ),
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: IconButton(
+            onPressed: onPressed,
+            icon: const Icon(Icons.fast_forward),
+          ),
+        )
       ],
     );
+  }
+
+  Future<void> onPressed() async {
+    final Duration? currentDuration = await controller.position;
+    if (currentDuration != null) {
+      final Duration newDuration = currentDuration + const Duration(seconds: 1);
+      await controller.seekTo(newDuration);
+    }
   }
 }
 

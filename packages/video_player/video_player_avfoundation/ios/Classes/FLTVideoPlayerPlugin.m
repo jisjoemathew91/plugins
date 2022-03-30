@@ -40,6 +40,7 @@
 @property(nonatomic, readonly) BOOL disposed;
 @property(nonatomic, readonly) BOOL isPlaying;
 @property(nonatomic) BOOL isLooping;
+@property(nonatomic) double currentPlaybackSpeed;
 @property(nonatomic, readonly) BOOL isInitialized;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
@@ -323,6 +324,7 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   }
   if (_isPlaying) {
     [_player play];
+    [self setPlaybackSpeed:_currentPlaybackSpeed];
   } else {
     [_player pause];
   }
@@ -438,6 +440,7 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     return;
   }
 
+  [self setCurrentPlaybackSpeed:speed];
   _player.rate = speed;
 }
 
