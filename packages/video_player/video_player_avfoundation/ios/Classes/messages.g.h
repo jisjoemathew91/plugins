@@ -65,12 +65,16 @@ NS_ASSUME_NONNULL_BEGIN
                           uri:(nullable NSString *)uri
                   packageName:(nullable NSString *)packageName
                    formatHint:(nullable NSString *)formatHint
+                     duration:(nullable NSNumber *)duration
+                    enableLog:(nullable NSNumber *)enableLog
                   httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders;
 @property(nonatomic, copy, nullable) NSString *asset;
 @property(nonatomic, copy, nullable) NSString *uri;
 @property(nonatomic, copy, nullable) NSString *packageName;
 @property(nonatomic, copy, nullable) NSString *formatHint;
 @property(nonatomic, strong) NSDictionary<NSString *, NSString *> *httpHeaders;
+@property(nonatomic, strong, nullable) NSNumber * duration;
+@property(nonatomic, strong, nullable) NSNumber * enableLog;
 @end
 
 @interface FLTMixWithOthersMessage : NSObject

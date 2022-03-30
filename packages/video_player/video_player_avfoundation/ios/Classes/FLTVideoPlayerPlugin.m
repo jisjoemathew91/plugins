@@ -30,8 +30,7 @@
 }
 @end
 
-@interface FLTVideoPlayer : NSObject <FlutterTexture, FlutterStreamHandler>
-@property(readonly, nonatomic) AVPlayer *player;
+@interface FLTVideoPlayer ()
 @property(readonly, nonatomic) AVPlayerItemVideoOutput *videoOutput;
 @property(readonly, nonatomic) CADisplayLink *displayLink;
 @property(nonatomic) FlutterEventChannel *eventChannel;
@@ -42,6 +41,8 @@
 @property(nonatomic) BOOL isLooping;
 @property(nonatomic) double currentPlaybackSpeed;
 @property(nonatomic, readonly) BOOL isInitialized;
+@property(assign, nonatomic) int startTime;
+@property(assign, nonatomic) BOOL isLoggingEnabled;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers;
@@ -99,6 +100,7 @@ static void *playbackBufferFullContext = &playbackBufferFullContext;
 }
 
 - (void)itemDidPlayToEndTime:(NSNotification *)notification {
+  [self log:@"Player did play to end time"];
   if (_isLooping) {
     AVPlayerItem *p = [notification object];
     [p seekToTime:kCMTimeZero completionHandler:nil];
@@ -185,6 +187,7 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   }
   AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:options];
   AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:urlAsset];
+  [self log:[NSString stringWithFormat:@"Player created (url: '%@', headers: '%@')", url.absoluteString, headers]];
   return [self initWithPlayerItem:item frameUpdater:frameUpdater];
 }
 
@@ -247,6 +250,8 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 
   _player = [AVPlayer playerWithPlayerItem:item];
   _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+    
+  self.startTime = 0;
 
   [self createVideoOutputAndDisplayLink:frameUpdater];
 
@@ -275,6 +280,7 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     AVPlayerItem *item = (AVPlayerItem *)object;
     switch (item.status) {
       case AVPlayerItemStatusFailed:
+        [self log:[NSString stringWithFormat:@"Player status: FAILED (%@)", item.error.localizedDescription]];
         if (_eventSink != nil) {
           _eventSink([FlutterError
               errorWithCode:@"VideoError"
@@ -284,11 +290,17 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
         }
         break;
       case AVPlayerItemStatusUnknown:
+        [self log:@"Player status: unknown"];
         break;
       case AVPlayerItemStatusReadyToPlay:
+        [self log:@"Player status: ready to play"];
         [item addOutput:_videoOutput];
         [self setupEventSinkIfReadyToPlay];
         [self updatePlayingState];
+            if (self.startTime != -1) {
+                [self.player seekToTime:CMTimeMake(self.startTime, 1000) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+                self.startTime = -1;
+            }
         break;
     }
   } else if (context == presentationSizeContext || context == durationContext) {
@@ -302,16 +314,19 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     }
   } else if (context == playbackLikelyToKeepUpContext) {
     if ([[_player currentItem] isPlaybackLikelyToKeepUp]) {
+      [self log:@"Player buffering completed"];
       [self updatePlayingState];
       if (_eventSink != nil) {
         _eventSink(@{@"event" : @"bufferingEnd"});
       }
     }
   } else if (context == playbackBufferEmptyContext) {
+    [self log:@"Player buffering started"];
     if (_eventSink != nil) {
       _eventSink(@{@"event" : @"bufferingStart"});
     }
   } else if (context == playbackBufferFullContext) {
+    [self log:@"Player buffering completed"];
     if (_eventSink != nil) {
       _eventSink(@{@"event" : @"bufferingEnd"});
     }
@@ -382,11 +397,13 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)play {
+  [self log:@"Player play"];
   _isPlaying = YES;
   [self updatePlayingState];
 }
 
 - (void)pause {
+  [self log:@"Player pause"];
   _isPlaying = NO;
   [self updatePlayingState];
 }
@@ -403,6 +420,7 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)seekTo:(int)location {
+    [self log:[NSString stringWithFormat:@"Player seek to %d", location]];
   // TODO(stuartmorgan): Update this to use completionHandler: to only return
   // once the seek operation is complete once the Pigeon API is updated to a
   // version that handles async calls.
@@ -412,16 +430,19 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)setIsLooping:(BOOL)isLooping {
+  [self log:[NSString stringWithFormat:@"Player set looping %d", isLooping]];
   _isLooping = isLooping;
 }
 
 - (void)setVolume:(double)volume {
+  [self log:[NSString stringWithFormat:@"Player set volume: %lf", volume]];
   _player.volume = (float)((volume < 0.0) ? 0.0 : ((volume > 1.0) ? 1.0 : volume));
 }
 
 - (void)setPlaybackSpeed:(double)speed {
   // See https://developer.apple.com/library/archive/qa/qa1772/_index.html for an explanation of
   // these checks.
+  [self log:[NSString stringWithFormat:@"Player set speed: %lf", speed]];
   if (speed > 2.0 && !_player.currentItem.canPlayFastForward) {
     if (_eventSink != nil) {
       _eventSink([FlutterError errorWithCode:@"VideoError"
@@ -500,6 +521,12 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   [_eventChannel setStreamHandler:nil];
 }
 
+- (void)log: (NSString *)msg {
+  if (self.isLoggingEnabled) {
+    NSLog(@"%@", msg);
+  }
+}
+
 @end
 
 @interface FLTVideoPlayerPlugin () <FLTAVFoundationVideoPlayerApi>
@@ -574,11 +601,17 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
       assetPath = [_registrar lookupKeyForAsset:input.asset];
     }
     player = [[FLTVideoPlayer alloc] initWithAsset:assetPath frameUpdater:frameUpdater];
+    if (input.duration.intValue > 0)
+      player.startTime = input.duration.intValue;
+    player.isLoggingEnabled = input.enableLog.boolValue;
     return [self onPlayerSetup:player frameUpdater:frameUpdater];
   } else if (input.uri) {
     player = [[FLTVideoPlayer alloc] initWithURL:[NSURL URLWithString:input.uri]
                                     frameUpdater:frameUpdater
                                      httpHeaders:input.httpHeaders];
+    if (input.duration.intValue > 0)
+      player.startTime = input.duration.intValue;
+    player.isLoggingEnabled = input.enableLog.boolValue;
     return [self onPlayerSetup:player frameUpdater:frameUpdater];
   } else {
     *error = [FlutterError errorWithCode:@"video_player" message:@"not implemented" details:nil];

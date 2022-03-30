@@ -138,6 +138,8 @@ class CreateMessage {
     this.uri,
     this.packageName,
     this.formatHint,
+    this.duration,
+    this.enableLog,
     required this.httpHeaders,
   });
 
@@ -145,6 +147,8 @@ class CreateMessage {
   String? uri;
   String? packageName;
   String? formatHint;
+  int? duration;
+  bool? enableLog;
   Map<String?, String?> httpHeaders;
 
   Object encode() {
@@ -154,6 +158,8 @@ class CreateMessage {
     pigeonMap['packageName'] = packageName;
     pigeonMap['formatHint'] = formatHint;
     pigeonMap['httpHeaders'] = httpHeaders;
+    pigeonMap['duration'] = duration;
+    pigeonMap['enableLog'] = enableLog;
     return pigeonMap;
   }
 
@@ -164,6 +170,8 @@ class CreateMessage {
       uri: pigeonMap['uri'] as String?,
       packageName: pigeonMap['packageName'] as String?,
       formatHint: pigeonMap['formatHint'] as String?,
+      duration: pigeonMap['duration'] as int?,
+      enableLog: pigeonMap['enableLog'] as bool?,
       httpHeaders: (pigeonMap['httpHeaders'] as Map<Object?, Object?>?)!
           .cast<String?, String?>(),
     );

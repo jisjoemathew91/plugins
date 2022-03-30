@@ -27,9 +27,11 @@ import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.view.TextureRegistry;
@@ -56,6 +58,7 @@ final class VideoPlayer {
   private final EventChannel eventChannel;
 
   private boolean isInitialized = false;
+  private boolean needLogging = false;
 
   private final VideoPlayerOptions options;
 
@@ -66,10 +69,16 @@ final class VideoPlayer {
       String dataSource,
       String formatHint,
       @NonNull Map<String, String> httpHeaders,
-      VideoPlayerOptions options) {
+      VideoPlayerOptions options,
+      long duration,
+      Boolean enableLog) {
     this.eventChannel = eventChannel;
     this.textureEntry = textureEntry;
     this.options = options;
+
+    if (enableLog != null) {
+      this.needLogging = enableLog;
+    }
 
     exoPlayer = new SimpleExoPlayer.Builder(context).build();
 
@@ -85,6 +94,9 @@ final class VideoPlayer {
       if (httpHeaders != null && !httpHeaders.isEmpty()) {
         httpDataSourceFactory.setDefaultRequestProperties(httpHeaders);
       }
+      if (this.needLogging) {
+        httpDataSourceFactory.setTransferListener(new TransferListenerImpl());
+      }
       dataSourceFactory = httpDataSourceFactory;
     } else {
       dataSourceFactory = new DefaultDataSourceFactory(context, "ExoPlayer");
@@ -95,6 +107,7 @@ final class VideoPlayer {
     exoPlayer.prepare();
 
     setupVideoPlayer(eventChannel, textureEntry);
+    seekTo((int) duration);
   }
 
   private static boolean isHTTP(Uri uri) {
@@ -153,6 +166,7 @@ final class VideoPlayer {
     }
   }
 
+  @SuppressWarnings("deprecation")
   private void setupVideoPlayer(
       EventChannel eventChannel, TextureRegistry.SurfaceTextureEntry textureEntry) {
     eventChannel.setStreamHandler(
@@ -171,6 +185,8 @@ final class VideoPlayer {
     surface = new Surface(textureEntry.surfaceTexture());
     exoPlayer.setVideoSurface(surface);
     setAudioAttributes(exoPlayer, options.mixWithOthers);
+
+    if (needLogging) exoPlayer.addAnalyticsListener(new EventLogger(new DefaultTrackSelector()));
 
     exoPlayer.addListener(
         new Listener() {

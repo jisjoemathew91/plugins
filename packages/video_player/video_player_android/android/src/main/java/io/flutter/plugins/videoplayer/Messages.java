@@ -432,6 +432,26 @@ public class Messages {
       this.httpHeaders = setterArg;
     }
 
+    private Long duration;
+
+    public Long getDuration() {
+      return duration;
+    }
+
+    public void setDuration(Long setterArg) {
+      this.duration = setterArg;
+    }
+
+    private Boolean enableLog;
+
+    public Boolean getEnableLog() {
+      return enableLog;
+    }
+
+    public void setEnableLog(Boolean setterArg) {
+      this.enableLog = setterArg;
+    }
+
     /** Constructor is private to enforce null safety; use Builder. */
     private CreateMessage() {}
 
@@ -471,6 +491,20 @@ public class Messages {
         return this;
       }
 
+      private @Nullable Long duration;
+
+      public @NonNull Builder setDuration(@NonNull Long setterArg) {
+        this.duration = setterArg;
+        return this;
+      }
+
+      private @Nullable Boolean enableLog;
+
+      public @NonNull Builder setEnableLog(@NonNull Boolean setterArg) {
+        this.enableLog = setterArg;
+        return this;
+      }
+
       public @NonNull CreateMessage build() {
         CreateMessage pigeonReturn = new CreateMessage();
         pigeonReturn.setAsset(asset);
@@ -478,6 +512,8 @@ public class Messages {
         pigeonReturn.setPackageName(packageName);
         pigeonReturn.setFormatHint(formatHint);
         pigeonReturn.setHttpHeaders(httpHeaders);
+        pigeonReturn.setDuration(duration);
+        pigeonReturn.setEnableLog(enableLog);
         return pigeonReturn;
       }
     }
@@ -490,10 +526,13 @@ public class Messages {
       toMapResult.put("packageName", packageName);
       toMapResult.put("formatHint", formatHint);
       toMapResult.put("httpHeaders", httpHeaders);
+      toMapResult.put("duration", duration);
+      toMapResult.put("enableLog", enableLog);
       return toMapResult;
     }
 
     static @NonNull CreateMessage fromMap(@NonNull Map<String, Object> map) {
+      map.forEach((key, value) -> System.out.println(key + ":" + value));
       CreateMessage pigeonResult = new CreateMessage();
       Object asset = map.get("asset");
       pigeonResult.setAsset((String) asset);
@@ -505,6 +544,13 @@ public class Messages {
       pigeonResult.setFormatHint((String) formatHint);
       Object httpHeaders = map.get("httpHeaders");
       pigeonResult.setHttpHeaders((Map<String, String>) httpHeaders);
+      Object duration = map.get("duration");
+      pigeonResult.duration =
+              (duration == null)
+                      ? null
+                      : ((duration instanceof Integer) ? (Integer) duration : (Long) duration);
+      Object enableLog = map.get("enableLog");
+      pigeonResult.enableLog = (Boolean) enableLog;
       return pigeonResult;
     }
   }

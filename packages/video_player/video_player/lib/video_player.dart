@@ -206,8 +206,12 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// The name of the asset is given by the [dataSource] argument and must not be
   /// null. The [package] argument must be non-null when the asset comes from a
   /// package and null otherwise.
-  VideoPlayerController.asset(this.dataSource,
-      {this.package, this.closedCaptionFile, this.videoPlayerOptions})
+  VideoPlayerController.asset(this.dataSource, {
+    this.package,
+    this.closedCaptionFile,
+    this.videoPlayerOptions = const VideoPlayerOptions(),
+    this.enableLog = false,
+  })
       : dataSourceType = DataSourceType.asset,
         formatHint = null,
         httpHeaders = const <String, String>{},
@@ -226,9 +230,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     this.dataSource, {
     this.formatHint,
     this.closedCaptionFile,
-    this.videoPlayerOptions,
+    this.videoPlayerOptions = const VideoPlayerOptions(),
     this.httpHeaders = const <String, String>{},
-  })  : dataSourceType = DataSourceType.network,
+    this.enableLog = false,
+  })
+      : dataSourceType = DataSourceType.network,
         package = null,
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -236,8 +242,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   ///
   /// This will load the file from the file-URI given by:
   /// `'file://${file.path}'`.
-  VideoPlayerController.file(File file,
-      {this.closedCaptionFile, this.videoPlayerOptions})
+  VideoPlayerController.file(File file, {
+    this.closedCaptionFile,
+    this.videoPlayerOptions = const VideoPlayerOptions(),
+    this.enableLog = false,
+  })
       : dataSource = 'file://${file.path}',
         dataSourceType = DataSourceType.file,
         package = null,
@@ -250,9 +259,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// This will load the video from the input content-URI.
   /// This is supported on Android only.
   VideoPlayerController.contentUri(Uri contentUri,
-      {this.closedCaptionFile, this.videoPlayerOptions})
+      {this.closedCaptionFile, this.videoPlayerOptions = const VideoPlayerOptions(), this.enableLog = false,})
       : assert(defaultTargetPlatform == TargetPlatform.android,
-            'VideoPlayerController.contentUri is only supported on Android.'),
+  'VideoPlayerController.contentUri is only supported on Android.'),
         dataSource = contentUri.toString(),
         dataSourceType = DataSourceType.contentUri,
         package = null,
@@ -278,7 +287,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   final DataSourceType dataSourceType;
 
   /// Provide additional configuration options (optional). Like setting the audio mode to mix
-  final VideoPlayerOptions? videoPlayerOptions;
+  final VideoPlayerOptions videoPlayerOptions;
 
   /// Only set for [asset] videos. The package that the asset was loaded from.
   final String? package;
@@ -289,6 +298,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// This future will be awaited and the file will be loaded when
   /// [initialize()] is called.
   final Future<ClosedCaptionFile>? closedCaptionFile;
+
+  /// Enable logging for analytics and network
+  final bool enableLog;
 
   ClosedCaptionFile? _closedCaptionFile;
   Timer? _timer;
@@ -308,9 +320,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   int get textureId => _textureId;
 
   /// Attempts to open the given [dataSource] and load metadata about the video.
-  Future<void> initialize() async {
+  Future<void> initialize({Duration duration = Duration.zero}) async {
     final bool allowBackgroundPlayback =
-        videoPlayerOptions?.allowBackgroundPlayback ?? false;
+        videoPlayerOptions.allowBackgroundPlayback;
     if (!allowBackgroundPlayback) {
       _lifeCycleObserver = _VideoAppLifeCycleObserver(this);
     }
@@ -324,6 +336,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           sourceType: DataSourceType.asset,
           asset: dataSource,
           package: package,
+          duration: duration,
+          enableLog: enableLog,
         );
         break;
       case DataSourceType.network:
@@ -332,12 +346,16 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           uri: dataSource,
           formatHint: formatHint,
           httpHeaders: httpHeaders,
+          duration: duration,
+          enableLog: enableLog,
         );
         break;
       case DataSourceType.file:
         dataSourceDescription = DataSource(
           sourceType: DataSourceType.file,
           uri: dataSource,
+          duration: duration,
+          enableLog: enableLog,
         );
         break;
       case DataSourceType.contentUri:
@@ -348,9 +366,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
         break;
     }
 
-    if (videoPlayerOptions?.mixWithOthers != null) {
+    if (videoPlayerOptions.mixWithOthers != null) {
       await _videoPlayerPlatform
-          .setMixWithOthers(videoPlayerOptions!.mixWithOthers);
+          .setMixWithOthers(videoPlayerOptions.mixWithOthers);
     }
 
     _textureId = (await _videoPlayerPlatform.create(dataSourceDescription)) ??
@@ -669,11 +687,6 @@ class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         _wasPlayingBeforePause = _controller.value.isPlaying;
         _controller.pause();
-        break;
-      case AppLifecycleState.resumed:
-        if (_wasPlayingBeforePause) {
-          _controller.play();
-        }
         break;
       default:
     }
