@@ -3,14 +3,7 @@
 // found in the LICENSE file.
 
 #import <Flutter/Flutter.h>
-#import <AVFoundation/AVFoundation.h>
 
 @interface FLTVideoPlayerPlugin : NSObject <FlutterPlugin>
 - (instancetype)initWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar;
-@end
-
-@interface FLTVideoPlayer : NSObject <FlutterTexture, FlutterStreamHandler>
-@property(readonly, nonatomic) AVPlayer* player;
-- (void)play;
-- (void)pause;
 @end
