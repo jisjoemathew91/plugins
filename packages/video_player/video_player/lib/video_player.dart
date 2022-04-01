@@ -49,6 +49,7 @@ class VideoPlayerValue {
     this.volume = 1.0,
     this.playbackSpeed = 1.0,
     this.errorDescription,
+    this.hasInternetError = false,
   });
 
   /// Returns an instance for a video that hasn't been loaded.
@@ -108,6 +109,9 @@ class VideoPlayerValue {
   /// If [hasError] is false this is `null`.
   final String? errorDescription;
 
+  /// (Only for iOS) Indicates if the error on platform related to Internet connection
+  final bool hasInternetError;
+
   /// The [size] of the currently loaded video.
   final Size size;
 
@@ -151,6 +155,7 @@ class VideoPlayerValue {
     double? volume,
     double? playbackSpeed,
     String? errorDescription = _defaultErrorDescription,
+    bool? hasInternetError,
   }) {
     return VideoPlayerValue(
       duration: duration ?? this.duration,
@@ -168,6 +173,7 @@ class VideoPlayerValue {
       errorDescription: errorDescription != _defaultErrorDescription
           ? errorDescription
           : this.errorDescription,
+      hasInternetError: hasInternetError ?? this.hasInternetError,
     );
   }
 
@@ -426,10 +432,19 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
 
     void errorListener(Object obj) {
       final PlatformException e = obj as PlatformException;
-      value = VideoPlayerValue.erroneous(e.message!);
-      _timer?.cancel();
-      if (!initializingCompleter.isCompleted) {
-        initializingCompleter.completeError(obj);
+      // Только для iOS. Если получаем ошибку с кодом InternetVideoError -
+      // не пересоздаем контроллер через VideoPlayerValue.erroneous
+      // Сохраняем текущее состояние и устанавливаем флаг hasInternetError
+      // Вероятно, все ошибки с кодом InternetVideoError - отсутствие интернета
+      if (Platform.isIOS && e.code.contains('InternetVideoError')) {
+        final valueWithFlag = value.copyWith(hasInternetError: true);
+        value = valueWithFlag;
+      } else {
+        value = VideoPlayerValue.erroneous(e.message!);
+        _timer?.cancel();
+        if (!initializingCompleter.isCompleted) {
+          initializingCompleter.completeError(obj);
+        }
       }
     }
 
