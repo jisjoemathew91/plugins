@@ -50,6 +50,8 @@ class CreateMessage {
   String? packageName;
   String? formatHint;
   Map<String?, String?> httpHeaders;
+  int? duration;
+  bool? enableLog;
 }
 
 class MixWithOthersMessage {

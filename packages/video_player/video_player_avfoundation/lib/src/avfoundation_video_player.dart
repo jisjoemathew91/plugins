@@ -38,6 +38,8 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
     String? uri;
     String? formatHint;
     Map<String, String> httpHeaders = <String, String>{};
+    int? duration;
+    bool? enableLog;
     switch (dataSource.sourceType) {
       case DataSourceType.asset:
         asset = dataSource.asset;
@@ -62,6 +64,9 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
       httpHeaders: httpHeaders,
       formatHint: formatHint,
     );
+
+    message.duration = dataSource.duration?.inMilliseconds;
+    message.enableLog = dataSource.enableLog;
 
     final TextureMessage response = await _api.create(message);
     return response.textureId;

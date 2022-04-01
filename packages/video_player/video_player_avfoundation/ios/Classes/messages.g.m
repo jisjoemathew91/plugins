@@ -176,6 +176,8 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
                           uri:(nullable NSString *)uri
                   packageName:(nullable NSString *)packageName
                    formatHint:(nullable NSString *)formatHint
+                     duration:(nullable NSNumber *)duration
+                    enableLog:(nullable NSNumber *)enableLog
                   httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders {
   FLTCreateMessage *pigeonResult = [[FLTCreateMessage alloc] init];
   pigeonResult.asset = asset;
@@ -183,6 +185,8 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   pigeonResult.packageName = packageName;
   pigeonResult.formatHint = formatHint;
   pigeonResult.httpHeaders = httpHeaders;
+  pigeonResult.duration = duration;
+  pigeonResult.enableLog = enableLog;
   return pigeonResult;
 }
 + (FLTCreateMessage *)fromMap:(NSDictionary *)dict {
@@ -192,6 +196,8 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   pigeonResult.packageName = GetNullableObject(dict, @"packageName");
   pigeonResult.formatHint = GetNullableObject(dict, @"formatHint");
   pigeonResult.httpHeaders = GetNullableObject(dict, @"httpHeaders");
+  pigeonResult.duration = GetNullableObject(dict, @"duration");
+  pigeonResult.enableLog = GetNullableObject(dict, @"enableLog");
   NSAssert(pigeonResult.httpHeaders != nil, @"");
   return pigeonResult;
 }
@@ -203,6 +209,10 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
                                    @"packageName",
                                    (self.formatHint ? self.formatHint : [NSNull null]),
                                    @"formatHint",
+                                   (self.duration ? self.duration : [NSNull null]),
+                                   @"duration",
+                                   (self.enableLog ? self.enableLog : [NSNull null]),
+                                   @"enableLog",
                                    (self.httpHeaders ? self.httpHeaders : [NSNull null]),
                                    @"httpHeaders", nil];
 }

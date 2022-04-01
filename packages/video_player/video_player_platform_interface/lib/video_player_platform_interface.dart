@@ -121,6 +121,8 @@ class DataSource {
   ///
   /// The [package] argument must be non-null when the asset comes from a
   /// package and null otherwise.
+  ///
+  /// The [duration] time for initialization
   DataSource({
     required this.sourceType,
     this.uri,
@@ -128,6 +130,8 @@ class DataSource {
     this.asset,
     this.package,
     this.httpHeaders = const <String, String>{},
+    this.duration,
+    this.enableLog,
   });
 
   /// The way in which the video was originally loaded.
@@ -157,6 +161,12 @@ class DataSource {
   /// The package that the asset was loaded from. Only set for
   /// [DataSourceType.asset] videos.
   final String? package;
+
+  /// Duration for initialization
+  final Duration? duration;
+
+  /// Enable log for analytics and network
+  final bool? enableLog;
 }
 
 /// The way in which the video was originally loaded.
@@ -354,7 +364,7 @@ class VideoPlayerOptions {
   // in all of the other video player packages, fix this, and then update
   // the other packages to use const.
   // ignore: prefer_const_constructors_in_immutables
-  VideoPlayerOptions({
+  const VideoPlayerOptions({
     this.mixWithOthers = false,
     this.allowBackgroundPlayback = false,
   });

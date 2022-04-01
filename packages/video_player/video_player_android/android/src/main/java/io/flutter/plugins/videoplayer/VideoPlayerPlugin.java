@@ -139,7 +139,9 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
               "asset:///" + assetLookupKey,
               null,
               null,
-              options);
+              options,
+              arg.getDuration(),
+              arg.getEnableLog());
     } else {
       @SuppressWarnings("unchecked")
       Map<String, String> httpHeaders = arg.getHttpHeaders();
@@ -151,7 +153,9 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
               arg.getUri(),
               arg.getFormatHint(),
               httpHeaders,
-              options);
+              options,
+              arg.getDuration(),
+              arg.getEnableLog());
     }
     videoPlayers.put(handle.id(), player);
 

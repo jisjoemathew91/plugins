@@ -56,8 +56,8 @@ class _App extends StatelessWidget {
         body: TabBarView(
           children: <Widget>[
             const _RemoteVideo(),
-            _ButterFlyAssetVideo(),
-            _ButterFlyAssetVideoInList(),
+            _ExampleVideo.asset(key: UniqueKey()),
+            _ExampleVideoInList(),
           ],
         ),
       ),
@@ -65,7 +65,7 @@ class _App extends StatelessWidget {
   }
 }
 
-class _ButterFlyAssetVideoInList extends StatelessWidget {
+class _ExampleVideoInList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -86,12 +86,12 @@ class _ButterFlyAssetVideoInList extends StatelessWidget {
                 title: Text('Video video'),
               ),
               Stack(
-                  alignment: FractionalOffset.bottomRight +
-                      const FractionalOffset(-0.1, -0.1),
-                  children: <Widget>[
-                    _ButterFlyAssetVideo(),
-                    Image.asset('assets/flutter-mark-square-64.png'),
-                  ]),
+                alignment: FractionalOffset.bottomRight +
+                    const FractionalOffset(-0.1, -0.1),
+                children: <Widget>[
+                  _ExampleVideo.asset(key: UniqueKey()),
+                ],
+              ),
             ],
           ),
         ])),
@@ -143,62 +143,6 @@ class _ExampleCard extends StatelessWidget {
   }
 }
 
-class _ButterFlyAssetVideo extends StatefulWidget {
-  @override
-  _ButterFlyAssetVideoState createState() => _ButterFlyAssetVideoState();
-}
-
-class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
-  late VideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.asset('assets/Butterfly-209.mp4');
-
-    _controller.addListener(() {
-      setState(() {});
-    });
-    _controller.setLooping(true);
-    _controller.initialize().then((_) => setState(() {}));
-    _controller.play();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.only(top: 20.0),
-          ),
-          const Text('With assets mp4'),
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  VideoPlayer(_controller),
-                  _ControlsOverlay(controller: _controller),
-                  VideoProgressIndicator(_controller, allowScrubbing: true),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _RemoteVideo extends StatefulWidget {
   const _RemoteVideo({Key? key}) : super(key: key);
 
@@ -213,157 +157,42 @@ class _RemoteVideoState extends State<_RemoteVideo> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: Column(
+      child: ListView(
         children: [
-          ToggleButtons(
-            children: const <Widget>[
-              Text('MP4'),
-              Text('HLS'),
-            ],
-            onPressed: (int index) {
-              setState(() {
-                for (int buttonIndex = 0;
-                    buttonIndex < isSelected.length;
-                    buttonIndex++) {
-                  if (buttonIndex == index) {
-                    isSelected[buttonIndex] = true;
-                  } else {
-                    isSelected[buttonIndex] = false;
+          Align(
+            child: ToggleButtons(
+              children: const <Widget>[
+                Text('MP4'),
+                Text('HLS'),
+              ],
+              onPressed: (int index) {
+                setState(() {
+                  for (int buttonIndex = 0;
+                      buttonIndex < isSelected.length;
+                      buttonIndex++) {
+                    if (buttonIndex == index) {
+                      isSelected[buttonIndex] = true;
+                    } else {
+                      isSelected[buttonIndex] = false;
+                    }
                   }
-                }
-              });
-            },
-            isSelected: isSelected,
+                });
+              },
+              isSelected: isSelected,
+            ),
           ),
           if (isSelected[0])
-            _BumbleBeeRemoteVideo()
+            _ExampleVideo.mp4(key: UniqueKey())
           else
-            const _BigBuckBunnyVideo(),
+            _ExampleVideo.streaming(key: UniqueKey())
         ],
       ),
     );
   }
 }
 
-class _BumbleBeeRemoteVideo extends StatefulWidget {
-  @override
-  _BumbleBeeRemoteVideoState createState() => _BumbleBeeRemoteVideoState();
-}
-
-class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
-  late VideoPlayerController _controller;
-
-  Future<ClosedCaptionFile> _loadCaptions() async {
-    final String fileContents = await DefaultAssetBundle.of(context)
-        .loadString('assets/bumble_bee_captions.vtt');
-    return WebVTTCaptionFile(
-        fileContents); // For vtt files, use WebVTTCaptionFile
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
-      closedCaptionFile: _loadCaptions(),
-      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-    );
-
-    _controller.addListener(() {
-      setState(() {});
-    });
-    _controller.setLooping(true);
-    _controller.initialize();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(20),
-          child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: <Widget>[
-                VideoPlayer(_controller),
-                ClosedCaption(text: _controller.value.caption.text),
-                _ControlsOverlay(controller: _controller),
-                VideoProgressIndicator(_controller, allowScrubbing: true),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _BigBuckBunnyVideo extends StatefulWidget {
-  const _BigBuckBunnyVideo({Key? key}) : super(key: key);
-
-  @override
-  _BigBuckBunnyVideoState createState() => _BigBuckBunnyVideoState();
-}
-
-class _BigBuckBunnyVideoState extends State<_BigBuckBunnyVideo> {
-  late VideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(
-      'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
-      formatHint: VideoFormat.hls,
-      videoPlayerOptions: VideoPlayerOptions(),
-    );
-
-    _controller.addListener(() {
-      setState(() {});
-    });
-    _controller.setLooping(true);
-    _controller.initialize().then((_) => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(20),
-          child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: <Widget>[
-                VideoPlayer(_controller),
-                _ControlsOverlay(controller: _controller),
-                VideoProgressIndicator(_controller, allowScrubbing: true),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ControlsOverlay extends StatelessWidget {
-  const _ControlsOverlay({Key? key, required this.controller})
-      : super(key: key);
+class ControlsOverlay extends StatelessWidget {
+  const ControlsOverlay({Key? key, required this.controller}) : super(key: key);
 
   static const List<Duration> _exampleCaptionOffsets = <Duration>[
     Duration(seconds: -10),
@@ -548,5 +377,179 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
         ),
       ),
     );
+  }
+}
+
+class _ExampleVideo extends StatefulWidget {
+  const _ExampleVideo._({
+    required this.isStreaming,
+    required this.isAsset,
+    Key? key,
+  }) : super(key: key);
+
+  factory _ExampleVideo.mp4({Key? key}) {
+    return _ExampleVideo._(
+      isStreaming: false,
+      isAsset: false,
+      key: key,
+    );
+  }
+
+  factory _ExampleVideo.streaming({Key? key}) {
+    return _ExampleVideo._(
+      isStreaming: true,
+      isAsset: false,
+      key: key,
+    );
+  }
+
+  factory _ExampleVideo.asset({Key? key}) {
+    return _ExampleVideo._(
+      isStreaming: false,
+      isAsset: true,
+      key: key,
+    );
+  }
+
+  /// Is video using streaming source
+  final bool isStreaming;
+
+  /// Is video using asset source
+  final bool isAsset;
+
+  @override
+  _ExampleVideoState createState() => _ExampleVideoState();
+}
+
+class _ExampleVideoState extends State<_ExampleVideo> {
+  late TextEditingController _textController;
+  late VideoPlayerController _videoController;
+
+  Duration _startDuration = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController();
+    _initVideoController();
+  }
+
+  @override
+  void dispose() {
+    _videoController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: AspectRatio(
+              aspectRatio: _videoController.value.aspectRatio,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: <Widget>[
+                  VideoPlayer(_videoController),
+                  ControlsOverlay(controller: _videoController),
+                  VideoProgressIndicator(_videoController,
+                      allowScrubbing: true),
+                ],
+              ),
+            ),
+          ),
+          ListTile(
+            title: const Text('Video first start duration'),
+            subtitle: Text('${_startDuration.inSeconds.toString()} s'),
+            trailing: IconButton(
+                onPressed: _showDialog, icon: const Icon(Icons.edit)),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _reinitVideoController() {
+    _videoController.pause();
+    _videoController.dispose();
+    _initVideoController();
+  }
+
+  void _initVideoController() {
+    if (widget.isAsset) {
+      _videoController = VideoPlayerController.asset(
+        'assets/Butterfly-209.mp4',
+        enableLog: true
+      );
+    } else if (widget.isStreaming) {
+      _videoController = VideoPlayerController.network(
+        'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
+        formatHint: VideoFormat.hls,
+        videoPlayerOptions: const VideoPlayerOptions(),
+      );
+    } else {
+      _videoController = VideoPlayerController.network(
+        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+        closedCaptionFile: _loadCaptions(),
+        videoPlayerOptions: const VideoPlayerOptions(mixWithOthers: true),
+      );
+    }
+
+    _videoController.addListener(() {
+      setState(() {});
+    });
+
+    _videoController.setLooping(true);
+    _videoController
+        .initialize(duration: _startDuration)
+        .then((_) => setState(() {}));
+    _videoController.play();
+  }
+
+  Future<void> _showDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Choose video start duration'),
+          content: TextField(
+            controller: _textController,
+            keyboardType: TextInputType.number,
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Submit'),
+              onPressed: () {
+                _onSubmitStartTime();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _onSubmitStartTime() {
+    final int? seconds = int.tryParse(_textController.text);
+    if (seconds != null) {
+      final Duration newStartDuration = Duration(seconds: seconds);
+      if (newStartDuration != _startDuration) {
+        setState(() {
+          _startDuration = newStartDuration;
+        });
+        _reinitVideoController();
+      }
+    }
+  }
+
+  Future<ClosedCaptionFile> _loadCaptions() async {
+    final String fileContents = await DefaultAssetBundle.of(context)
+        .loadString('assets/bumble_bee_captions.vtt');
+    return WebVTTCaptionFile(
+        fileContents); // For vtt files, use WebVTTCaptionFile
   }
 }

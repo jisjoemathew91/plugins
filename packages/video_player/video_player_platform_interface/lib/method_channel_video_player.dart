@@ -51,6 +51,9 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
         break;
     }
 
+    message.duration = dataSource.duration?.inMilliseconds;
+    message.enableLog = dataSource.enableLog;
+
     final TextureMessage response = await _api.create(message);
     return response.textureId;
   }
