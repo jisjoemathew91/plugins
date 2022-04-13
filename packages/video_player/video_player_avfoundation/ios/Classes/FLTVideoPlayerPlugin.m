@@ -98,6 +98,9 @@ static void *playbackBufferFullContext = &playbackBufferFullContext;
                                            selector:@selector(itemDidPlayToEndTime:)
                                                name:AVPlayerItemDidPlayToEndTimeNotification
                                              object:item];
+    
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemFailedToPlayToEndTime:) name:AVPlayerItemNewErrorLogEntryNotification object:item];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemFailedToPlayToEndTime:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:item];
 }
 
 - (void)itemDidPlayToEndTime:(NSNotification *)notification {
@@ -111,6 +114,52 @@ static void *playbackBufferFullContext = &playbackBufferFullContext;
     }
   }
 }
+
+- (void)itemFailedToPlayToEndTime:(NSNotification *)notification {
+  if (!_eventSink)
+    return;
+
+  if (notification.name == AVPlayerItemFailedToPlayToEndTimeNotification) {
+    NSError *error = notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey];
+    [self log:[NSString stringWithFormat:@"Player error occured: %@, %@", error.localizedDescription, [NSString stringWithUTF8String:error.domain.UTF8String]]];
+    _eventSink([FlutterError errorWithCode:@"InternetVideoError" message:[@"Failed to load video: " stringByAppendingString:error.localizedDescription] details:[self createErrorInfoFromError:error]]);
+  } else {
+    AVPlayerItemErrorLog *log = self.player.currentItem.errorLog;
+
+    if ([log.events count]) {
+      AVPlayerItemErrorLogEvent *e = log.events.lastObject;
+      [self log:[NSString stringWithFormat:@"Player error occured: %@", e.errorComment]];
+      _eventSink([FlutterError errorWithCode:@"InternetVideoError" message:[NSString stringWithFormat: @"Failed to load video: %@", e.errorComment] details:[self createErrorInfoFromLogEvent:e]]);
+    } else {
+      [self log:@"Unknown player error occured"];
+      _eventSink([FlutterError errorWithCode:@"InternetVideoError" message:@"Failed to load video: Вероятно, соединение с интернетом прервано." details:nil]);
+    }
+  }
+}
+
+- (NSDictionary *)createErrorInfoFromError: (NSError *)error {
+  if (!error)
+    return nil;
+
+  NSMutableDictionary *info = [NSMutableDictionary new];
+    if (error.domain.UTF8String)
+      [info setObject:[NSString stringWithUTF8String:error.domain.UTF8String] forKey:@"domain"];
+  [info setObject:[NSNumber numberWithLong:error.code] forKey:@"code"];
+
+  return info;
+}
+
+- (NSDictionary *)createErrorInfoFromLogEvent: (AVPlayerItemErrorLogEvent *)event {
+  if (!event)
+    return nil;
+
+  NSMutableDictionary *info = [NSMutableDictionary new];
+  [info setObject:event.errorDomain forKey:@"domain"];
+  [info setObject:[NSNumber numberWithLong:event.errorStatusCode] forKey:@"code"];
+
+   return info;
+}
+
 
 const int64_t TIME_UNSET = -9223372036854775807;
 
