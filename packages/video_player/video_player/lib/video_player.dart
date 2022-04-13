@@ -324,9 +324,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   static const int kUninitializedTextureId = -1;
   int _textureId = kUninitializedTextureId;
 
-  /// This is just exposed for testing. It shouldn't be used by anyone depending
-  /// on the plugin.
-  @visibleForTesting
+  /// Убрал аннотацию @visibleForTesting
+  /// Это поле нужно нам для PictureInPicture
   int get textureId => _textureId;
 
   /// Attempts to open the given [dataSource] and load metadata about the video.

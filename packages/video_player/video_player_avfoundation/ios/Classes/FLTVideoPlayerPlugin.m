@@ -30,7 +30,7 @@
 }
 @end
 
-@interface FLTVideoPlayer : NSObject <FlutterTexture, FlutterStreamHandler>
+@interface FLTVideoPlayer ()
 @property(readonly, nonatomic) AVPlayer *player;
 @property(readonly, nonatomic) AVPlayerItemVideoOutput *videoOutput;
 @property(readonly, nonatomic) CADisplayLink *displayLink;
@@ -394,13 +394,15 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   if (!_isInitialized) {
     return;
   }
-  if (_isPlaying) {
-    [_player play];
-    [self setPlaybackSpeed:_currentPlaybackSpeed];
-  } else {
-    [_player pause];
+  if (!_isPipActive) {
+      if (_isPlaying) {
+        [_player play];
+        [self setPlaybackSpeed:_currentPlaybackSpeed];
+      } else {
+        [_player pause];
+      }
+      _displayLink.paused = !_isPlaying;
   }
-  _displayLink.paused = !_isPlaying;
 }
 
 - (void)setupEventSinkIfReadyToPlay {
@@ -589,8 +591,6 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 @interface FLTVideoPlayerPlugin () <FLTAVFoundationVideoPlayerApi>
 @property(readonly, weak, nonatomic) NSObject<FlutterTextureRegistry> *registry;
 @property(readonly, weak, nonatomic) NSObject<FlutterBinaryMessenger> *messenger;
-@property(readonly, strong, nonatomic)
-    NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
 @property(readonly, strong, nonatomic) NSObject<FlutterPluginRegistrar> *registrar;
 @end
 
