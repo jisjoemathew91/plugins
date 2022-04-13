@@ -31,7 +31,6 @@
 @end
 
 @interface FLTVideoPlayer ()
-@property(readonly, nonatomic) AVPlayer *player;
 @property(readonly, nonatomic) AVPlayerItemVideoOutput *videoOutput;
 @property(readonly, nonatomic) CADisplayLink *displayLink;
 @property(nonatomic) FlutterEventChannel *eventChannel;
