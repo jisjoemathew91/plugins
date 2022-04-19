@@ -439,7 +439,12 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
         final valueWithFlag = value.copyWith(hasInternetError: true);
         value = valueWithFlag;
       } else {
-        value = VideoPlayerValue.erroneous(e.message!);
+        final details = e.details;
+        if (details != null && details is String) {
+          value = VideoPlayerValue.erroneous(details);
+        } else {
+          value = VideoPlayerValue.erroneous(e.message!);
+        }
         _timer?.cancel();
         if (!initializingCompleter.isCompleted) {
           initializingCompleter.completeError(obj);

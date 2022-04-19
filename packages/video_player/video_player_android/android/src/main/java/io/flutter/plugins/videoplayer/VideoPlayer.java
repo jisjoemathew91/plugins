@@ -226,7 +226,14 @@ final class VideoPlayer {
           public void onPlayerError(final ExoPlaybackException error) {
             setBuffering(false);
             if (eventSink != null) {
-              eventSink.error("VideoError", "Video player had error " + error, null);
+              HoleErrorBuilder holeError = new HoleErrorBuilder();
+              holeError.parseError(error);
+
+              eventSink.error(
+                  "VideoError",
+                  "Video player had error " + error,
+                  holeError.toString()
+              );
             }
           }
         });

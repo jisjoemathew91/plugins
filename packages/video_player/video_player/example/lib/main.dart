@@ -482,7 +482,7 @@ class _ExampleVideoState extends State<_ExampleVideo> {
     if (widget.isAsset) {
       _videoController = VideoPlayerController.asset(
         'assets/Butterfly-209.mp4',
-        enableLog: true
+        enableLog: true,
       );
     } else if (widget.isStreaming) {
       _videoController = VideoPlayerController.network(
@@ -492,7 +492,7 @@ class _ExampleVideoState extends State<_ExampleVideo> {
       );
     } else {
       _videoController = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
         closedCaptionFile: _loadCaptions(),
         videoPlayerOptions: const VideoPlayerOptions(mixWithOthers: true),
       );
