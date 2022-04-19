@@ -11,8 +11,6 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.source.UnrecognizedInputFormatException;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 
-import java.util.Arrays;
-
 public class HoleErrorBuilder {
   private final StringBuilder sb;
 
@@ -64,7 +62,6 @@ public class HoleErrorBuilder {
     if (error.type == TYPE_UNEXPECTED) {
       append("rawException", error.getUnexpectedException());
     }
-    appendStackTrace();
   }
 
   private void append(String field, Object value) {
@@ -73,11 +70,6 @@ public class HoleErrorBuilder {
     } else {
       sb.append("'").append(field).append("': ").append("'").append(value).append("'");
     }
-  }
-
-  private void appendStackTrace() {
-    final String st = Arrays.deepToString(new Exception().getStackTrace());
-    append("stacktrace", st);
   }
 
   private void appendDataSourceDescription(int errorType) {

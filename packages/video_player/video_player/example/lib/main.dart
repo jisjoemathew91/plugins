@@ -503,9 +503,12 @@ class _ExampleVideoState extends State<_ExampleVideo> {
     });
 
     _videoController.setLooping(true);
-    _videoController
-        .initialize(duration: _startDuration)
-        .then((_) => setState(() {}));
+    _videoController.initialize(duration: _startDuration).then(
+      (_) => setState(() {}),
+      onError: (Object e) {
+        print(_videoController.value.errorDescription);
+      },
+    );
     _videoController.play();
   }
 
