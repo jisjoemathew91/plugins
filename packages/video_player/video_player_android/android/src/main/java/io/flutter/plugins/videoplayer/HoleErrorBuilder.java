@@ -114,6 +114,7 @@ public class HoleErrorBuilder {
   @NonNull
   @Override
   public String toString() {
+    sb.append("}");
     return sb.toString();
   }
 }
