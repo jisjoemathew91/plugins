@@ -507,6 +507,8 @@ class _ExampleVideoState extends State<_ExampleVideo> {
       (_) => setState(() {}),
       onError: (Object e) {
         print(_videoController.value.errorDescription);
+        print('-------------------------------------');
+        print(_videoController.value.holeErrorDescription);
       },
     );
     _videoController.play();

@@ -49,6 +49,7 @@ class VideoPlayerValue {
     this.volume = 1.0,
     this.playbackSpeed = 1.0,
     this.errorDescription,
+    this.holeErrorDescription,
     this.hasInternetError = false,
   });
 
@@ -57,10 +58,11 @@ class VideoPlayerValue {
       : this(duration: Duration.zero, isInitialized: false);
 
   /// Returns an instance with the given [errorDescription].
-  VideoPlayerValue.erroneous(String errorDescription)
+  VideoPlayerValue.erroneous(String errorDescription, String? holeErrorDescription)
       : this(
             duration: Duration.zero,
             isInitialized: false,
+            holeErrorDescription: holeErrorDescription,
             errorDescription: errorDescription);
 
   /// This constant is just to indicate that parameter is not passed to [copyWith]
@@ -108,6 +110,9 @@ class VideoPlayerValue {
   ///
   /// If [hasError] is false this is `null`.
   final String? errorDescription;
+
+  /// (Only for Android) Additional info about error data
+  final String? holeErrorDescription;
 
   /// (Only for iOS) Indicates if the error on platform related to Internet connection
   final bool hasInternetError;
@@ -441,9 +446,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       } else {
         final details = e.details;
         if (details != null && details is String) {
-          value = VideoPlayerValue.erroneous(details);
+          value = VideoPlayerValue.erroneous(e.message!, details);
         } else {
-          value = VideoPlayerValue.erroneous(e.message!);
+          value = VideoPlayerValue.erroneous(e.message!, null);
         }
         _timer?.cancel();
         if (!initializingCompleter.isCompleted) {
