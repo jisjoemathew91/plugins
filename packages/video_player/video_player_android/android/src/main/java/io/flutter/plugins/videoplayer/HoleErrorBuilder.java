@@ -66,9 +66,9 @@ public class HoleErrorBuilder {
 
   private void append(String field, Object value) {
     if (sb.length() > 1) {
-      sb.append(", '").append(field).append("': ").append("'").append(value).append("'");
+      sb.append(", \"").append(field).append("\": ").append("\"").append(value).append("\"");
     } else {
-      sb.append("'").append(field).append("': ").append("'").append(value).append("'");
+      sb.append("\"").append(field).append("\": ").append("\"").append(value).append("\"");
     }
   }
 
