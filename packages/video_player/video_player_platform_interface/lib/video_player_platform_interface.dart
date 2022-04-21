@@ -221,6 +221,10 @@ class VideoEvent {
     this.size,
     this.rotationCorrection,
     this.buffered,
+    this.droppedFramesCount,
+    this.vfpoRate,
+    this.mediaItemFormat,
+    this.nonFatalError,
   });
 
   /// The type of the event.
@@ -245,6 +249,18 @@ class VideoEvent {
   ///
   /// Only used if [eventType] is [VideoEventType.bufferingUpdate].
   final List<DurationRange>? buffered;
+
+  /// Количество потерянных кадров
+  final int? droppedFramesCount;
+
+  /// Метрика fps
+  final int? vfpoRate;
+
+  /// Формат видео|аудио
+  final String? mediaItemFormat;
+
+  /// Нефатальные ошибки кодека
+  final String? nonFatalError;
 
   @override
   bool operator ==(Object other) {
@@ -286,6 +302,18 @@ enum VideoEventType {
 
   /// The video stopped to buffer.
   bufferingEnd,
+
+  /// Дроп кадров
+  framesDropped,
+
+  /// Метрика fps
+  vfpoRate,
+
+  /// Изменился формат видео/аудио
+  formatChanged,
+
+  /// Нефатальная ошибка кодека
+  nonFatalVideoCodecError,
 
   /// An unknown event has been received.
   unknown,

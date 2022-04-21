@@ -152,6 +152,30 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
           return VideoEvent(eventType: VideoEventType.bufferingStart);
         case 'bufferingEnd':
           return VideoEvent(eventType: VideoEventType.bufferingEnd);
+        case 'framesDropped':
+          final int droppedFramesCount = map['value']! as int;
+          return VideoEvent(
+            eventType: VideoEventType.framesDropped,
+            droppedFramesCount: droppedFramesCount,
+          );
+        case 'vfpoRate':
+          final int vfpoRate = map['value']! as int;
+          return VideoEvent(
+            eventType: VideoEventType.vfpoRate,
+            vfpoRate: vfpoRate,
+          );
+        case 'formatChanged':
+          String format = map['value']! as String;
+          return VideoEvent(
+            eventType: VideoEventType.formatChanged,
+            mediaItemFormat: format,
+          );
+        case 'nonFatalVideoCodecError':
+          String error = map['value']! as String;
+          return VideoEvent(
+            eventType: VideoEventType.formatChanged,
+            nonFatalError: error,
+          );
         default:
           return VideoEvent(eventType: VideoEventType.unknown);
       }

@@ -466,7 +466,34 @@ class _ExampleVideoState extends State<_ExampleVideo> {
             subtitle: Text('${_startDuration.inSeconds.toString()} s'),
             trailing: IconButton(
                 onPressed: _showDialog, icon: const Icon(Icons.edit)),
-          )
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _videoController.seekTo(
+                _videoController.value.buffered.last.end -
+                    const Duration(seconds: 5),
+              );
+            },
+            child: Text('buffer end'),
+          ),
+          Wrap(
+            children: [
+              Text('isBuffering: ${_videoController.value.isBuffering}'),
+              Text('hasError: ${_videoController.value.hasError}'),
+              Text('position: ${_videoController.value.position}'),
+              Text('playbackSpeed: ${_videoController.value.playbackSpeed}'),
+              Text('dropped: ${_videoController.value.framesBeenDropped}'),
+              Text('vfpoRate: ${_videoController.value.vfpoRate}'),
+              Text('format: ${_videoController.value.mediaItemFormat}'),
+            ]
+                .map(
+                  (child) => Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: child,
+                  ),
+                )
+                .toList(),
+          ),
         ],
       ),
     );

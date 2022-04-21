@@ -51,6 +51,10 @@ class VideoPlayerValue {
     this.errorDescription,
     this.holeErrorDescription,
     this.hasInternetError = false,
+    this.framesBeenDropped = 0,
+    this.vfpoRate = 0,
+    this.mediaItemFormat,
+    this.nonFatalVideoCodecError,
   });
 
   /// Returns an instance for a video that hasn't been loaded.
@@ -117,6 +121,20 @@ class VideoPlayerValue {
   /// (Only for iOS) Indicates if the error on platform related to Internet connection
   final bool hasInternetError;
 
+  /// (Only for Android) Количество потеряннх кадров
+  final int framesBeenDropped;
+
+  /// (Only for Android) Метрика fps. Говорят, что стоит беспокоиться, если значение меньше 40000.
+  /// На данный момент обновляется только при паузе
+  /// https://medium.com/google-exoplayer/improved-rendering-performance-operating-mediacodec-in-asynchronous-mode-and-asynchronous-buffer-3026207850b2
+  final int vfpoRate;
+
+  /// (Only for Android) Должен быть не null, если в процессе плеер поменял вато-качество
+  final String? mediaItemFormat;
+
+  /// (Only for Android) Нефатальные ошибки кодека
+  final String? nonFatalVideoCodecError;
+
   /// The [size] of the currently loaded video.
   final Size size;
 
@@ -161,6 +179,10 @@ class VideoPlayerValue {
     double? playbackSpeed,
     String? errorDescription = _defaultErrorDescription,
     bool? hasInternetError,
+    int? framesBeenDropped,
+    int? vfpoRate,
+    String? mediaItemFormat,
+    String? nonFatalVideoCodecError,
   }) {
     return VideoPlayerValue(
       duration: duration ?? this.duration,
@@ -179,6 +201,11 @@ class VideoPlayerValue {
           ? errorDescription
           : this.errorDescription,
       hasInternetError: hasInternetError ?? this.hasInternetError,
+      framesBeenDropped: framesBeenDropped ?? this.framesBeenDropped,
+      vfpoRate: vfpoRate ?? this.vfpoRate,
+      mediaItemFormat: mediaItemFormat ?? this.mediaItemFormat,
+      nonFatalVideoCodecError: nonFatalVideoCodecError ??
+          this.nonFatalVideoCodecError,
     );
   }
 
@@ -423,6 +450,18 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           break;
         case VideoEventType.bufferingEnd:
           value = value.copyWith(isBuffering: false);
+          break;
+        case VideoEventType.framesDropped:
+          value = value.copyWith(framesBeenDropped: event.droppedFramesCount);
+          break;
+        case VideoEventType.vfpoRate:
+          value = value.copyWith(vfpoRate: event.vfpoRate);
+          break;
+        case VideoEventType.formatChanged:
+          value = value.copyWith(mediaItemFormat: event.mediaItemFormat);
+          break;
+        case VideoEventType.nonFatalVideoCodecError:
+          value = value.copyWith(nonFatalVideoCodecError: event.nonFatalError);
           break;
         case VideoEventType.unknown:
           break;
