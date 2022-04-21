@@ -55,6 +55,7 @@ class VideoPlayerValue {
     this.vfpoRate = 0,
     this.mediaItemFormat,
     this.nonFatalVideoCodecError,
+    this.bandwidthData,
   });
 
   /// Returns an instance for a video that hasn't been loaded.
@@ -121,7 +122,7 @@ class VideoPlayerValue {
   /// (Only for iOS) Indicates if the error on platform related to Internet connection
   final bool hasInternetError;
 
-  /// (Only for Android) Количество потеряннх кадров
+  /// (Only for Android) Количество потерянных кадров
   final int framesBeenDropped;
 
   /// (Only for Android) Метрика fps. Говорят, что стоит беспокоиться, если значение меньше 40000.
@@ -134,6 +135,9 @@ class VideoPlayerValue {
 
   /// (Only for Android) Нефатальные ошибки кодека
   final String? nonFatalVideoCodecError;
+
+  /// (Only for Android) Инфа о ширине канала в формате totalLoadTimeMs|totalBytesLoaded|bitrateEstimate
+  final String? bandwidthData;
 
   /// The [size] of the currently loaded video.
   final Size size;
@@ -183,6 +187,7 @@ class VideoPlayerValue {
     int? vfpoRate,
     String? mediaItemFormat,
     String? nonFatalVideoCodecError,
+    String? bandwidthData,
   }) {
     return VideoPlayerValue(
       duration: duration ?? this.duration,
@@ -204,8 +209,9 @@ class VideoPlayerValue {
       framesBeenDropped: framesBeenDropped ?? this.framesBeenDropped,
       vfpoRate: vfpoRate ?? this.vfpoRate,
       mediaItemFormat: mediaItemFormat ?? this.mediaItemFormat,
-      nonFatalVideoCodecError: nonFatalVideoCodecError ??
-          this.nonFatalVideoCodecError,
+      nonFatalVideoCodecError:
+          nonFatalVideoCodecError ?? this.nonFatalVideoCodecError,
+      bandwidthData: bandwidthData ?? this.bandwidthData,
     );
   }
 
@@ -462,6 +468,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           break;
         case VideoEventType.nonFatalVideoCodecError:
           value = value.copyWith(nonFatalVideoCodecError: event.nonFatalError);
+          break;
+        case VideoEventType.bandwidthEstimate:
+          value = value.copyWith(bandwidthData: event.bandwidthData);
           break;
         case VideoEventType.unknown:
           break;

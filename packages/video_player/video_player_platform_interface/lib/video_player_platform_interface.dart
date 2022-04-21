@@ -225,6 +225,7 @@ class VideoEvent {
     this.vfpoRate,
     this.mediaItemFormat,
     this.nonFatalError,
+    this.bandwidthData,
   });
 
   /// The type of the event.
@@ -261,6 +262,8 @@ class VideoEvent {
 
   /// Нефатальные ошибки кодека
   final String? nonFatalError;
+
+  final String? bandwidthData;
 
   @override
   bool operator ==(Object other) {
@@ -314,6 +317,9 @@ enum VideoEventType {
 
   /// Нефатальная ошибка кодека
   nonFatalVideoCodecError,
+
+  /// Информация о ширине канала
+  bandwidthEstimate,
 
   /// An unknown event has been received.
   unknown,

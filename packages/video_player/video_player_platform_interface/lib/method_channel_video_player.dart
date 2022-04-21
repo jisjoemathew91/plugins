@@ -159,6 +159,12 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
             eventType: VideoEventType.formatChanged,
             nonFatalError: error,
           );
+        case 'bandwidthEstimate':
+          String data = map['value']! as String;
+          return VideoEvent(
+            eventType: VideoEventType.bandwidthEstimate,
+            bandwidthData: data,
+          );
         default:
           return VideoEvent(eventType: VideoEventType.unknown);
       }

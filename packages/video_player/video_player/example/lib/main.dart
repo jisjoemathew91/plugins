@@ -485,6 +485,7 @@ class _ExampleVideoState extends State<_ExampleVideo> {
               Text('dropped: ${_videoController.value.framesBeenDropped}'),
               Text('vfpoRate: ${_videoController.value.vfpoRate}'),
               Text('format: ${_videoController.value.mediaItemFormat}'),
+              Text('bandwidthData: ${_videoController.value.bandwidthData}'),
             ]
                 .map(
                   (child) => Padding(

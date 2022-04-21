@@ -48,6 +48,12 @@ public class HoleAnalyticsListener implements AnalyticsListener {
   }
 
   @Override
+  public void onBandwidthEstimate(EventTime eventTime, int totalLoadTimeMs, long totalBytesLoaded, long bitrateEstimate) {
+    wlog("bandwidthEstimate", totalLoadTimeMs + "|" + totalBytesLoaded + "|" + bitrateEstimate);
+    sendDataToTheHole("bandwidthEstimate", totalLoadTimeMs + "|" + totalBytesLoaded + "|" + bitrateEstimate);
+  }
+
+  @Override
   public void onDroppedVideoFrames(EventTime eventTime, int droppedFrames, long elapsedMs) {
     sendDataToTheHole("framesDropped", droppedFrames);
   }
