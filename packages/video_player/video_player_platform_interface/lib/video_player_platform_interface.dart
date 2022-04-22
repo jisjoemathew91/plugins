@@ -263,6 +263,7 @@ class VideoEvent {
   /// Нефатальные ошибки кодека
   final String? nonFatalError;
 
+  /// Информация о ширине канала
   final String? bandwidthData;
 
   @override
@@ -274,6 +275,9 @@ class VideoEvent {
             duration == other.duration &&
             size == other.size &&
             rotationCorrection == other.rotationCorrection &&
+            vfpoRate == other.vfpoRate &&
+            mediaItemFormat == other.mediaItemFormat &&
+            bandwidthData == other.bandwidthData &&
             listEquals(buffered, other.buffered);
   }
 
@@ -283,7 +287,12 @@ class VideoEvent {
       duration.hashCode ^
       size.hashCode ^
       rotationCorrection.hashCode ^
-      buffered.hashCode;
+      buffered.hashCode ^
+      droppedFramesCount.hashCode ^
+      vfpoRate.hashCode ^
+      mediaItemFormat.hashCode ^
+      nonFatalError.hashCode ^
+      bandwidthData.hashCode;
 }
 
 /// Type of the event.

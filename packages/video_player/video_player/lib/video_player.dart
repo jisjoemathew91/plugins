@@ -206,12 +206,12 @@ class VideoPlayerValue {
           ? errorDescription
           : this.errorDescription,
       hasInternetError: hasInternetError ?? this.hasInternetError,
-      framesBeenDropped: framesBeenDropped ?? this.framesBeenDropped,
-      vfpoRate: vfpoRate ?? this.vfpoRate,
-      mediaItemFormat: mediaItemFormat ?? this.mediaItemFormat,
+      framesBeenDropped: framesBeenDropped ?? 0,
+      vfpoRate: vfpoRate ?? 0,
+      mediaItemFormat: mediaItemFormat,
       nonFatalVideoCodecError:
-          nonFatalVideoCodecError ?? this.nonFatalVideoCodecError,
-      bandwidthData: bandwidthData ?? this.bandwidthData,
+      nonFatalVideoCodecError,
+      bandwidthData: bandwidthData,
     );
   }
 

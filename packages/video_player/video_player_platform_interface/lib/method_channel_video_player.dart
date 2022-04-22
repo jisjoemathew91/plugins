@@ -148,19 +148,19 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
             vfpoRate: vfpoRate,
           );
         case 'formatChanged':
-          String format = map['value']! as String;
+          final String format = map['value']! as String;
           return VideoEvent(
             eventType: VideoEventType.formatChanged,
             mediaItemFormat: format,
           );
         case 'nonFatalVideoCodecError':
-          String error = map['value']! as String;
+          final String error = map['value']! as String;
           return VideoEvent(
             eventType: VideoEventType.formatChanged,
             nonFatalError: error,
           );
         case 'bandwidthEstimate':
-          String data = map['value']! as String;
+          final String data = map['value']! as String;
           return VideoEvent(
             eventType: VideoEventType.bandwidthEstimate,
             bandwidthData: data,
