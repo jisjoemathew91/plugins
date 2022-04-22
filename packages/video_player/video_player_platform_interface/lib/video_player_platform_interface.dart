@@ -5,6 +5,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:video_player_platform_interface/hole_playback_metrics.dart';
 
 import 'method_channel_video_player.dart';
 
@@ -221,11 +222,7 @@ class VideoEvent {
     this.size,
     this.rotationCorrection,
     this.buffered,
-    this.droppedFramesCount,
-    this.vfpoRate,
-    this.mediaItemFormat,
-    this.nonFatalError,
-    this.bandwidthData,
+    this.playbackMetrics,
   });
 
   /// The type of the event.
@@ -251,20 +248,7 @@ class VideoEvent {
   /// Only used if [eventType] is [VideoEventType.bufferingUpdate].
   final List<DurationRange>? buffered;
 
-  /// Количество потерянных кадров
-  final int? droppedFramesCount;
-
-  /// Метрика fps
-  final int? vfpoRate;
-
-  /// Формат видео|аудио
-  final String? mediaItemFormat;
-
-  /// Нефатальные ошибки кодека
-  final String? nonFatalError;
-
-  /// Информация о ширине канала
-  final String? bandwidthData;
+  final HolePlaybackMetrics? playbackMetrics;
 
   @override
   bool operator ==(Object other) {
@@ -275,9 +259,7 @@ class VideoEvent {
             duration == other.duration &&
             size == other.size &&
             rotationCorrection == other.rotationCorrection &&
-            vfpoRate == other.vfpoRate &&
-            mediaItemFormat == other.mediaItemFormat &&
-            bandwidthData == other.bandwidthData &&
+            playbackMetrics == other.playbackMetrics &&
             listEquals(buffered, other.buffered);
   }
 
@@ -288,11 +270,7 @@ class VideoEvent {
       size.hashCode ^
       rotationCorrection.hashCode ^
       buffered.hashCode ^
-      droppedFramesCount.hashCode ^
-      vfpoRate.hashCode ^
-      mediaItemFormat.hashCode ^
-      nonFatalError.hashCode ^
-      bandwidthData.hashCode;
+      playbackMetrics.hashCode;
 }
 
 /// Type of the event.
@@ -315,20 +293,7 @@ enum VideoEventType {
   /// The video stopped to buffer.
   bufferingEnd,
 
-  /// Дроп кадров
-  framesDropped,
-
-  /// Метрика fps
-  vfpoRate,
-
-  /// Изменился формат видео/аудио
-  formatChanged,
-
-  /// Нефатальная ошибка кодека
-  nonFatalVideoCodecError,
-
-  /// Информация о ширине канала
-  bandwidthEstimate,
+  playbackMetrics,
 
   /// An unknown event has been received.
   unknown,

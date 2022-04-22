@@ -7,6 +7,7 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:video_player_platform_interface/hole_playback_metrics.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
 import 'messages.g.dart';
@@ -152,35 +153,21 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
           return VideoEvent(eventType: VideoEventType.bufferingStart);
         case 'bufferingEnd':
           return VideoEvent(eventType: VideoEventType.bufferingEnd);
-        case 'framesDropped':
-          final int droppedFramesCount = map['value']! as int;
+        case 'playbackMetrics':
           return VideoEvent(
-            eventType: VideoEventType.framesDropped,
-            droppedFramesCount: droppedFramesCount,
-          );
-        case 'vfpoRate':
-          final int vfpoRate = map['value']! as int;
-          return VideoEvent(
-            eventType: VideoEventType.vfpoRate,
-            vfpoRate: vfpoRate,
-          );
-        case 'formatChanged':
-          String format = map['value']! as String;
-          return VideoEvent(
-            eventType: VideoEventType.formatChanged,
-            mediaItemFormat: format,
-          );
-        case 'nonFatalVideoCodecError':
-          String error = map['value']! as String;
-          return VideoEvent(
-            eventType: VideoEventType.formatChanged,
-            nonFatalError: error,
-          );
-        case 'bandwidthEstimate':
-          String data = map['value']! as String;
-          return VideoEvent(
-            eventType: VideoEventType.bandwidthEstimate,
-            bandwidthData: data,
+            eventType: VideoEventType.playbackMetrics,
+            playbackMetrics: HolePlaybackMetrics(
+              videoMimeType: map['videoMimeType']! as String,
+              codec: map['codec']! as String,
+              height: map['height']! as int,
+              framesDropped: map['framesDropped']! as int,
+              frameDropRate: map['frameDropRate']! as double,
+              vfpo: map['vfpo']! as int,
+              meanBandWidth: map['meanBandWidth']! as int,
+              audioMimeType: map['audioMimeType']! as String,
+              hz: map['hz']! as int,
+              channelCount: map['channelCount']! as int,
+            ),
           );
         default:
           return VideoEvent(eventType: VideoEventType.unknown);

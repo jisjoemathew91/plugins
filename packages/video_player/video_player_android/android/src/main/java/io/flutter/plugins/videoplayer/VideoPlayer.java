@@ -9,7 +9,6 @@ import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import android.view.Surface;
 import androidx.annotation.NonNull;
 import com.google.android.exoplayer2.C;
@@ -20,11 +19,8 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.Listener;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
-import com.google.android.exoplayer2.analytics.PlaybackStats;
 import com.google.android.exoplayer2.analytics.PlaybackStatsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
-import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -70,7 +66,7 @@ final class VideoPlayer {
   // Слушатель аналитики. Данные доступны только после смерти плеера. Зато очень подробные
   private final PlaybackStatsListener playbackStatsListener = new PlaybackStatsListener(true, null);
   // Слушатель аналитии. Отправляет события на платформу live
-  private final AnalyticsListener holeAnalyticsListener = new HoleAnalyticsListener(eventSink);
+  private final HoleAnalyticsListener holeAnalyticsListener = new HoleAnalyticsListener();
 
   VideoPlayer(
       Context context,
@@ -200,6 +196,7 @@ final class VideoPlayer {
 
     if (needLogging) exoPlayer.addAnalyticsListener(new EventLogger(new DefaultTrackSelector()));
 
+    holeAnalyticsListener.setup(eventSink, playbackStatsListener);
     exoPlayer.addAnalyticsListener(holeAnalyticsListener);
 
     exoPlayer.addListener(
@@ -339,7 +336,7 @@ final class VideoPlayer {
       // https://github.com/google/ExoPlayer/issues/8772
       exoPlayer.removeAnalyticsListener(playbackStatsListener);
       exoPlayer.removeAnalyticsListener(holeAnalyticsListener);
-      HoleAnalyticsListener.parsePlaybackStats(playbackStatsListener);
+      holeAnalyticsListener.dispose();
       exoPlayer.release();
     }
   }

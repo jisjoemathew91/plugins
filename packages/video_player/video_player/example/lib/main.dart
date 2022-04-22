@@ -482,10 +482,13 @@ class _ExampleVideoState extends State<_ExampleVideo> {
               Text('hasError: ${_videoController.value.hasError}'),
               Text('position: ${_videoController.value.position}'),
               Text('playbackSpeed: ${_videoController.value.playbackSpeed}'),
-              Text('dropped: ${_videoController.value.framesBeenDropped}'),
-              Text('vfpoRate: ${_videoController.value.vfpoRate}'),
-              Text('format: ${_videoController.value.mediaItemFormat}'),
-              Text('bandwidthData: ${_videoController.value.bandwidthData}'),
+              Text(
+                  'dropped: ${_videoController.value.playbackMetrics?.framesDropped}'),
+              Text('vfpoRate: ${_videoController.value.playbackMetrics?.vfpo}'),
+              Text(
+                  'format: ${_videoController.value.playbackMetrics?.videoMimeType}'),
+              Text(
+                  'bandwidthData: ${_videoController.value.playbackMetrics?.meanBandWidth}'),
             ]
                 .map(
                   (child) => Padding(
@@ -514,7 +517,8 @@ class _ExampleVideoState extends State<_ExampleVideo> {
       );
     } else if (widget.isStreaming) {
       _videoController = VideoPlayerController.network(
-        'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
+        'https://0c6d038a-3309-416c-8331-7a5a3be3ce8b.selcdn.net/media/videos/f493d97b-de69-40a2-a506-3449728d0a5e/1080p_playlist.m3u8',
+        // 'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
         formatHint: VideoFormat.hls,
         videoPlayerOptions: const VideoPlayerOptions(),
       );
@@ -527,6 +531,7 @@ class _ExampleVideoState extends State<_ExampleVideo> {
     }
 
     _videoController.addListener(() {
+      // final vc = _videoController.value;
       setState(() {});
     });
 
