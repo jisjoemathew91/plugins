@@ -11,6 +11,11 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.source.UnrecognizedInputFormatException;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 
+/**
+ * Обертка над {@link StringBuilder} для форматирования ошибок при создании плеера в json-строку.
+ * Для парсинга исключения использовать <b>parseError</b>
+ * Для преобразования ошибки в строку следует использовать <b>toString</b>.
+ */
 public class HoleErrorBuilder {
   private final StringBuilder sb;
 
@@ -18,6 +23,10 @@ public class HoleErrorBuilder {
     sb = new StringBuilder("{");
   }
 
+  /**
+   * Принимает {@link ExoPlaybackException} и преобразует в сроку для отправки во Flutter
+   * @param error ошибка плеера
+   */
   public void parseError(final ExoPlaybackException error) {
     appendErrorType(error.type);
     append("message", error.getMessage());

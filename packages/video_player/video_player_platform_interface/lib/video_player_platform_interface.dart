@@ -293,6 +293,8 @@ enum VideoEventType {
   /// The video stopped to buffer.
   bufferingEnd,
 
+  /// (Пока только Android) Данные о процессе воспроизведения, подробнее в доке класса [HolePlaybackMetrics].
+  /// Приходят в обычный слушатель плеера.
   playbackMetrics,
 
   /// An unknown event has been received.
