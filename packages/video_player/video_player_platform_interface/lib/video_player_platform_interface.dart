@@ -5,6 +5,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:video_player_platform_interface/hole_playback_metrics.dart';
 
 import 'method_channel_video_player.dart';
 
@@ -221,6 +222,7 @@ class VideoEvent {
     this.size,
     this.rotationCorrection,
     this.buffered,
+    this.playbackMetrics,
   });
 
   /// The type of the event.
@@ -246,6 +248,8 @@ class VideoEvent {
   /// Only used if [eventType] is [VideoEventType.bufferingUpdate].
   final List<DurationRange>? buffered;
 
+  final HolePlaybackMetrics? playbackMetrics;
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -255,6 +259,7 @@ class VideoEvent {
             duration == other.duration &&
             size == other.size &&
             rotationCorrection == other.rotationCorrection &&
+            playbackMetrics == other.playbackMetrics &&
             listEquals(buffered, other.buffered);
   }
 
@@ -264,7 +269,8 @@ class VideoEvent {
       duration.hashCode ^
       size.hashCode ^
       rotationCorrection.hashCode ^
-      buffered.hashCode;
+      buffered.hashCode ^
+      playbackMetrics.hashCode;
 }
 
 /// Type of the event.
@@ -286,6 +292,10 @@ enum VideoEventType {
 
   /// The video stopped to buffer.
   bufferingEnd,
+
+  /// (Пока только Android) Данные о процессе воспроизведения, подробнее в доке класса [HolePlaybackMetrics].
+  /// Приходят в обычный слушатель плеера.
+  playbackMetrics,
 
   /// An unknown event has been received.
   unknown,

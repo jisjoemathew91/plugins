@@ -19,6 +19,7 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.Listener;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.analytics.PlaybackStatsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
@@ -62,6 +63,11 @@ final class VideoPlayer {
 
   private final VideoPlayerOptions options;
 
+  // Слушатель аналитики. Данные доступны только после смерти плеера. Зато очень подробные
+  private final PlaybackStatsListener playbackStatsListener = new PlaybackStatsListener(true, null);
+  // Слушатель аналитии. Отправляет события на платформу live
+  private final HoleAnalyticsListener holeAnalyticsListener = new HoleAnalyticsListener();
+
   VideoPlayer(
       Context context,
       EventChannel eventChannel,
@@ -81,6 +87,8 @@ final class VideoPlayer {
     }
 
     exoPlayer = new SimpleExoPlayer.Builder(context).build();
+
+    exoPlayer.addAnalyticsListener(playbackStatsListener);
 
     Uri uri = Uri.parse(dataSource);
 
@@ -188,6 +196,9 @@ final class VideoPlayer {
 
     if (needLogging) exoPlayer.addAnalyticsListener(new EventLogger(new DefaultTrackSelector()));
 
+    holeAnalyticsListener.setup(eventSink, playbackStatsListener);
+    exoPlayer.addAnalyticsListener(holeAnalyticsListener);
+
     exoPlayer.addListener(
         new Listener() {
           private boolean isBuffering = false;
@@ -226,7 +237,14 @@ final class VideoPlayer {
           public void onPlayerError(final ExoPlaybackException error) {
             setBuffering(false);
             if (eventSink != null) {
-              eventSink.error("VideoError", "Video player had error " + error, null);
+              HoleErrorBuilder holeError = new HoleErrorBuilder();
+              holeError.parseError(error);
+
+              eventSink.error(
+                  "VideoError",
+                  "Video player had error " + error,
+                  holeError.toString()
+              );
             }
           }
         });
@@ -314,6 +332,11 @@ final class VideoPlayer {
       surface.release();
     }
     if (exoPlayer != null) {
+      // Здесь обязательно удалить как миниум playbackStatsListener до вызова release, чтоб не было крэша
+      // https://github.com/google/ExoPlayer/issues/8772
+      exoPlayer.removeAnalyticsListener(playbackStatsListener);
+      exoPlayer.removeAnalyticsListener(holeAnalyticsListener);
+      holeAnalyticsListener.dispose();
       exoPlayer.release();
     }
   }

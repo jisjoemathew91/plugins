@@ -779,7 +779,7 @@ void main() {
 
     test('erroneous()', () {
       const String errorMessage = 'foo';
-      final VideoPlayerValue error = VideoPlayerValue.erroneous(errorMessage);
+      final VideoPlayerValue error = VideoPlayerValue.erroneous(errorMessage, null);
 
       expect(error.duration, equals(Duration.zero));
       expect(error.position, equals(Duration.zero));
@@ -855,13 +855,13 @@ void main() {
         expect(exactCopy.toString(), original.toString());
       });
       test('errorDescription is not persisted when copy with null', () {
-        final VideoPlayerValue original = VideoPlayerValue.erroneous('error');
+        final VideoPlayerValue original = VideoPlayerValue.erroneous('error', null);
         final VideoPlayerValue copy = original.copyWith(errorDescription: null);
 
         expect(copy.errorDescription, null);
       });
       test('errorDescription is changed when copy with another error', () {
-        final VideoPlayerValue original = VideoPlayerValue.erroneous('error');
+        final VideoPlayerValue original = VideoPlayerValue.erroneous('error', null);
         final VideoPlayerValue copy =
             original.copyWith(errorDescription: 'new error');
 

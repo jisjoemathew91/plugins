@@ -466,7 +466,38 @@ class _ExampleVideoState extends State<_ExampleVideo> {
             subtitle: Text('${_startDuration.inSeconds.toString()} s'),
             trailing: IconButton(
                 onPressed: _showDialog, icon: const Icon(Icons.edit)),
-          )
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _videoController.seekTo(
+                _videoController.value.buffered.last.end -
+                    const Duration(seconds: 5),
+              );
+            },
+            child: Text('buffer end'),
+          ),
+          Wrap(
+            children: [
+              Text('isBuffering: ${_videoController.value.isBuffering}'),
+              Text('hasError: ${_videoController.value.hasError}'),
+              Text('position: ${_videoController.value.position}'),
+              Text('playbackSpeed: ${_videoController.value.playbackSpeed}'),
+              Text(
+                  'dropped: ${_videoController.value.playbackMetrics?.framesDropped}'),
+              Text('vfpoRate: ${_videoController.value.playbackMetrics?.vfpo}'),
+              Text(
+                  'format: ${_videoController.value.playbackMetrics?.videoMimeType}'),
+              Text(
+                  'bandwidthData: ${_videoController.value.playbackMetrics?.meanBandWidth}'),
+            ]
+                .map(
+                  (child) => Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: child,
+                  ),
+                )
+                .toList(),
+          ),
         ],
       ),
     );
@@ -482,30 +513,37 @@ class _ExampleVideoState extends State<_ExampleVideo> {
     if (widget.isAsset) {
       _videoController = VideoPlayerController.asset(
         'assets/Butterfly-209.mp4',
-        enableLog: true
+        enableLog: true,
       );
     } else if (widget.isStreaming) {
       _videoController = VideoPlayerController.network(
-        'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
+        'https://0c6d038a-3309-416c-8331-7a5a3be3ce8b.selcdn.net/media/videos/f493d97b-de69-40a2-a506-3449728d0a5e/1080p_playlist.m3u8',
+        // 'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
         formatHint: VideoFormat.hls,
         videoPlayerOptions: const VideoPlayerOptions(),
       );
     } else {
       _videoController = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
         closedCaptionFile: _loadCaptions(),
         videoPlayerOptions: const VideoPlayerOptions(mixWithOthers: true),
       );
     }
 
     _videoController.addListener(() {
+      // final vc = _videoController.value;
       setState(() {});
     });
 
     _videoController.setLooping(true);
-    _videoController
-        .initialize(duration: _startDuration)
-        .then((_) => setState(() {}));
+    _videoController.initialize(duration: _startDuration).then(
+      (_) => setState(() {}),
+      onError: (Object e) {
+        print(_videoController.value.errorDescription);
+        print('-------------------------------------');
+        print(_videoController.value.holeErrorDescription);
+      },
+    );
     _videoController.play();
   }
 

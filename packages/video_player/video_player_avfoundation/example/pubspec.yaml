@@ -1,4 +1,4 @@
-name: video_player_example
+\name: video_player_example
 description: Demonstrates how to use the video_player plugin.
 publish_to: none
 
@@ -16,7 +16,11 @@ dependencies:
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
     path: ../
-  video_player_platform_interface: ">=4.2.0 <6.0.0"
+  video_player_platform_interface:
+    git:
+      url: https://github.com/surfstudio/plugins.git
+      ref: main
+      path: packages/video_player/video_player_platform_interface
 
 dev_dependencies:
   flutter_driver:
