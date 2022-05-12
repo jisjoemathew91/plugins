@@ -7,6 +7,7 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:video_player_platform_interface/hole_playback_metrics.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
 import 'messages.g.dart';
@@ -164,6 +165,22 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
           return VideoEvent(eventType: VideoEventType.bufferingStart);
         case 'bufferingEnd':
           return VideoEvent(eventType: VideoEventType.bufferingEnd);
+        case 'playbackMetrics':
+          return VideoEvent(
+            eventType: VideoEventType.playbackMetrics,
+            playbackMetrics: HolePlaybackMetrics(
+              videoMimeType: map['videoMimeType']! as String,
+              codec: map['codec']! as String,
+              height: map['height']! as int,
+              framesDropped: map['framesDropped']! as int,
+              frameDropRate: map['frameDropRate']! as double,
+              vfpo: map['vfpo']! as int,
+              meanBandWidth: map['meanBandWidth']! as int,
+              audioMimeType: map['audioMimeType']! as String,
+              hz: map['hz']! as int,
+              channelCount: map['channelCount']! as int,
+            ),
+          );
         default:
           return VideoEvent(eventType: VideoEventType.unknown);
       }
