@@ -132,6 +132,7 @@ class DataSource {
     this.httpHeaders = const <String, String>{},
     this.duration,
     this.enableLog,
+    this.bufferOptions,
   });
 
   /// The way in which the video was originally loaded.
@@ -167,6 +168,9 @@ class DataSource {
 
   /// Enable log for analytics and network
   final bool? enableLog;
+
+  /// Platform buffer options.
+  final BufferOptions? bufferOptions;
 }
 
 /// The way in which the video was originally loaded.
