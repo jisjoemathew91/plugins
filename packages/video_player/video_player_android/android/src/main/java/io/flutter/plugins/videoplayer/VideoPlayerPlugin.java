@@ -140,6 +140,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
               null,
               null,
               options,
+              arg.getBufferMessage(),
               arg.getDuration(),
               arg.getEnableLog());
     } else {
@@ -154,6 +155,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
               arg.getFormatHint(),
               httpHeaders,
               options,
+              arg.getBufferMessage(),
               arg.getDuration(),
               arg.getEnableLog());
     }

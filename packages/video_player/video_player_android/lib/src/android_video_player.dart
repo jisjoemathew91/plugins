@@ -37,9 +37,8 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
     String? packageName;
     String? uri;
     String? formatHint;
+    BufferMessage? bufferMessage;
     Map<String, String> httpHeaders = <String, String>{};
-    int? duration;
-    bool? enableLog;
     switch (dataSource.sourceType) {
       case DataSourceType.asset:
         asset = dataSource.asset;
@@ -49,6 +48,19 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
         uri = dataSource.uri;
         formatHint = _videoFormatStringMap[dataSource.formatHint];
         httpHeaders = dataSource.httpHeaders;
+
+        final BufferAndroidPlatformOptions? bufferOptions =
+            dataSource.bufferOptions?.androidPlatformOptions;
+        bufferMessage = BufferMessage(
+          minBufferMs: bufferOptions?.minBuffer?.inMilliseconds,
+          maxBufferMs: bufferOptions?.maxBuffer?.inMilliseconds,
+          bufferForPlaybackMs: bufferOptions?.bufferForPlayback?.inMilliseconds,
+          bufferForPlaybackAfterRebufferMs:
+              bufferOptions?.bufferForPlaybackAfterRebuffer?.inMilliseconds,
+          backBufferDurationMs: bufferOptions?.backBuffer?.inMilliseconds,
+          retainBackBufferFromKeyframe:
+              bufferOptions?.retainBackBufferFromKeyframe,
+        );
         break;
       case DataSourceType.file:
         uri = dataSource.uri;
@@ -63,10 +75,10 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
       uri: uri,
       httpHeaders: httpHeaders,
       formatHint: formatHint,
+      duration: dataSource.duration?.inMilliseconds,
+      enableLog: dataSource.enableLog,
+      bufferMessage: bufferMessage,
     );
-
-    message.duration = dataSource.duration?.inMilliseconds;
-    message.enableLog = dataSource.enableLog;
 
     final TextureMessage response = await _api.create(message);
     return response.textureId;
