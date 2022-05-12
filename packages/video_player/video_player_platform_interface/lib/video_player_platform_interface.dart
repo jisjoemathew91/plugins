@@ -380,3 +380,97 @@ class VideoPlayerOptions {
   /// currently no way to implement this feature in this platform).
   final bool mixWithOthers;
 }
+
+/// Video player's options for buffering.
+///
+/// Unfortunately, there are no ways to reduce platform-specific methods to a
+/// common API. So, we need to define platform-specific options for buffering.
+@immutable
+class BufferOptions {
+  /// Video player's options for buffering.
+  const BufferOptions({
+    this.iosPlatformOptions,
+    this.androidPlatformOptions,
+  });
+
+  /// /// iOS-sepcific options.
+  final BufferIosPlatformOptions? iosPlatformOptions;
+
+  /// Android-sepcific options.
+  final BufferAndroidPlatformOptions? androidPlatformOptions;
+}
+
+/// iOS-sepcific options for buffering.
+class BufferIosPlatformOptions {
+  /// Options for buffering.
+  const BufferIosPlatformOptions({
+    required this.preferredForwardBuffer,
+  });
+
+  /// The duration of the buffer in milliseconds.
+  ///
+  /// It's used parameter `preferredForwardBufferDuration` from AVPlayer.
+  /// More: https://developer.apple.com/documentation/avfoundation/avplayeritem/1643630-preferredforwardbufferduration
+  final Duration preferredForwardBuffer;
+}
+
+/// Android-sepcific options for buffering.
+@immutable
+class BufferAndroidPlatformOptions {
+  /// Options for buffering.
+  const BufferAndroidPlatformOptions({
+    this.minBuffer,
+    this.maxBuffer,
+    this.bufferForPlayback,
+    this.bufferForPlaybackAfterRebuffer,
+    this.backBuffer,
+    this.retainBackBufferFromKeyframe,
+  });
+
+  /// The minimum duration of media that the player will attempt to ensure is
+  /// buffered at all times, in milliseconds.
+  ///
+  /// Source: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/DefaultLoadControl.Builder.html#setBufferDurationsMs(int,int,int,int)
+  ///
+  /// The default value is controlled by the platform's player.
+  final Duration? minBuffer;
+
+  /// The maximum duration of media that the player will attempt to buffer, in
+  /// milliseconds.
+  ///
+  /// Source: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/DefaultLoadControl.Builder.html#setBufferDurationsMs(int,int,int,int)
+  ///
+  /// The default value is controlled by the platform's player.
+  final Duration? maxBuffer;
+
+  /// The duration of media that must be buffered for playback to start or
+  /// resume following a user action such as a seek, in milliseconds.
+  ///
+  /// Source: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/DefaultLoadControl.Builder.html#setBufferDurationsMs(int,int,int,int)
+  ///
+  /// The default value is controlled by the platform's player.
+  final Duration? bufferForPlayback;
+
+  /// The default duration of media that must be buffered for playback to resume
+  /// after a rebuffer, in milliseconds. A rebuffer is defined to be caused by
+  /// buffer depletion rather than a user action.
+  ///
+  /// Source: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/DefaultLoadControl.Builder.html#setBufferDurationsMs(int,int,int,int)
+  ///
+  /// The default value is controlled by the platform's player.
+  final Duration? bufferForPlaybackAfterRebuffer;
+
+  /// The back buffer duration in milliseconds.
+  ///
+  /// More: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/DefaultLoadControl.Builder.html#setBackBuffer(int,boolean)
+  ///
+  /// The default value is controlled by the platform's player.
+  final Duration? backBuffer;
+
+  /// Whether the back buffer is retained from the previous keyframe.
+  ///
+  /// More: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/DefaultLoadControl.Builder.html#setBackBuffer(int,boolean)
+  ///
+  /// The default value is controlled by the platform's player.
+  final bool? retainBackBufferFromKeyframe;
+}
