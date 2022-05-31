@@ -10,7 +10,9 @@ import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
 import android.content.Context;
 import android.net.Uri;
 import android.view.Surface;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
@@ -29,13 +31,16 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
+
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.view.TextureRegistry;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -153,13 +158,13 @@ final class VideoPlayer {
     switch (type) {
       case C.TYPE_SS:
         return new SsMediaSource.Factory(
-                new DefaultSsChunkSource.Factory(mediaDataSourceFactory),
-                new DefaultDataSourceFactory(context, null, mediaDataSourceFactory))
+            new DefaultSsChunkSource.Factory(mediaDataSourceFactory),
+            new DefaultDataSourceFactory(context, null, mediaDataSourceFactory))
             .createMediaSource(MediaItem.fromUri(uri));
       case C.TYPE_DASH:
         return new DashMediaSource.Factory(
-                new DefaultDashChunkSource.Factory(mediaDataSourceFactory),
-                new DefaultDataSourceFactory(context, null, mediaDataSourceFactory))
+            new DefaultDashChunkSource.Factory(mediaDataSourceFactory),
+            new DefaultDataSourceFactory(context, null, mediaDataSourceFactory))
             .createMediaSource(MediaItem.fromUri(uri));
       case C.TYPE_HLS:
         return new HlsMediaSource.Factory(mediaDataSourceFactory)
@@ -167,10 +172,9 @@ final class VideoPlayer {
       case C.TYPE_OTHER:
         return new ProgressiveMediaSource.Factory(mediaDataSourceFactory)
             .createMediaSource(MediaItem.fromUri(uri));
-      default:
-        {
-          throw new IllegalStateException("Unsupported type: " + type);
-        }
+      default: {
+        throw new IllegalStateException("Unsupported type: " + type);
+      }
     }
   }
 
@@ -292,6 +296,19 @@ final class VideoPlayer {
 
   void seekTo(int location) {
     exoPlayer.seekTo(location);
+  }
+
+  void setPreferredVideoSize(int widht, int height) {
+    TrackSelector trackSelector = exoPlayer.getTrackSelector();
+    if (trackSelector instanceof DefaultTrackSelector) {
+      DefaultTrackSelector defaultTrackSelector = (DefaultTrackSelector) trackSelector;
+      DefaultTrackSelector.Parameters parameters = defaultTrackSelector.getParameters();
+      defaultTrackSelector.setParameters(
+          parameters.buildUpon()
+              .setMaxVideoSize(widht, height)
+              .build()
+      );
+    }
   }
 
   long getPosition() {

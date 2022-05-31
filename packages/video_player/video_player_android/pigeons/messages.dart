@@ -56,6 +56,13 @@ class MixWithOthersMessage {
   bool mixWithOthers;
 }
 
+class QualityMessage {
+  QualityMessage(this.textureId, this.width, this.height);
+  int textureId;
+  double width;
+  double height;
+}
+
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')
 abstract class AndroidVideoPlayerApi {
   void initialize();
@@ -69,4 +76,5 @@ abstract class AndroidVideoPlayerApi {
   void seekTo(PositionMessage msg);
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
+  void setPreferredQuality(QualityMessage msg);
 }

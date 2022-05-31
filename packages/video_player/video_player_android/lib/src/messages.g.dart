@@ -199,6 +199,35 @@ class MixWithOthersMessage {
   }
 }
 
+class QualityMessage {
+  QualityMessage({
+    required this.textureId,
+    required this.width,
+    required this.height,
+  });
+
+  int textureId;
+  double width;
+  double height;
+
+  Object encode() {
+    final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
+    pigeonMap['textureId'] = textureId;
+    pigeonMap['width'] = width;
+    pigeonMap['height'] = height;
+    return pigeonMap;
+  }
+
+  static QualityMessage decode(Object message) {
+    final Map<Object?, Object?> pigeonMap = message as Map<Object?, Object?>;
+    return QualityMessage(
+      textureId: pigeonMap['textureId']! as int,
+      width: pigeonMap['width']! as double,
+      height: pigeonMap['height']! as double,
+    );
+  }
+}
+
 class _AndroidVideoPlayerApiCodec extends StandardMessageCodec {
   const _AndroidVideoPlayerApiCodec();
   @override
@@ -206,25 +235,36 @@ class _AndroidVideoPlayerApiCodec extends StandardMessageCodec {
     if (value is CreateMessage) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is LoopingMessage) {
+    } else
+    if (value is LoopingMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is MixWithOthersMessage) {
+    } else
+    if (value is MixWithOthersMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is PlaybackSpeedMessage) {
+    } else
+    if (value is PlaybackSpeedMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is PositionMessage) {
+    } else
+    if (value is PositionMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is TextureMessage) {
+    } else
+    if (value is QualityMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is VolumeMessage) {
+    } else
+    if (value is TextureMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else {
+    } else
+    if (value is VolumeMessage) {
+      buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else
+    {
       super.writeValue(buffer, value);
     }
   }
@@ -534,6 +574,28 @@ class AndroidVideoPlayerApi {
     } else if (replyMap['error'] != null) {
       final Map<Object?, Object?> error =
           (replyMap['error'] as Map<Object?, Object?>?)!;
+      throw PlatformException(
+        code: (error['code'] as String?)!,
+        message: error['message'] as String?,
+        details: error['details'],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> setPreferredQuality(QualityMessage arg_msg) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.AndroidVideoPlayerApi.setPreferredQuality', codec, binaryMessenger: _binaryMessenger);
+    final Map<Object?, Object?>? replyMap =
+    await channel.send(<Object?>[arg_msg]) as Map<Object?, Object?>?;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object?, Object?> error = (replyMap['error'] as Map<Object?, Object?>?)!;
       throw PlatformException(
         code: (error['code'] as String?)!,
         message: error['message'] as String?,
