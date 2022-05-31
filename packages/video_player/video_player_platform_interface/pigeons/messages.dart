@@ -45,8 +45,9 @@ class MixWithOthersMessage {
 }
 
 class QualityMessage {
-  int width;
-  int height;
+  int textureId;
+  double width;
+  double height;
 }
 
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')

@@ -153,8 +153,9 @@ class MixWithOthersMessage {
 }
 
 class QualityMessage {
-  int? width;
-  int? height;
+  int? textureId;
+  double? width;
+  double? height;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
@@ -166,8 +167,9 @@ class QualityMessage {
   static QualityMessage decode(Object message) {
     final Map<Object, Object> pigeonMap = message as Map<Object, Object>;
     return QualityMessage()
-      ..width = pigeonMap['width'] as int
-      ..height = pigeonMap['height'] as int;
+      ..textureId = pigeonMap['textureId'] as int?
+      ..width = pigeonMap['width'] as double
+      ..height = pigeonMap['height'] as double;
   }
 }
 
@@ -424,9 +426,11 @@ class VideoPlayerApi {
 
   Future<void> setMixWithOthers(MixWithOthersMessage arg) async {
     final Object encoded = arg.encode();
-    const BasicMessageChannel<Object?> channel =
-        BasicMessageChannel<Object?>('dev.flutter.pigeon.VideoPlayerApi.setMixWithOthers', StandardMessageCodec());
-    final Map<Object, Object> replyMap = await channel.send(encoded) as Map<Object, Object>;
+    const BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.VideoPlayerApi.setMixWithOthers',
+        StandardMessageCodec());
+    final Map<Object, Object> replyMap =
+        await channel.send(encoded) as Map<Object, Object>;
     if (replyMap == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -434,7 +438,8 @@ class VideoPlayerApi {
         details: null,
       );
     } else if (replyMap['error'] != null) {
-      final Map<Object, Object> error = replyMap['error'] as Map<Object, Object>;
+      final Map<Object, Object> error =
+          replyMap['error'] as Map<Object, Object>;
       throw PlatformException(
         code: error['code'] as String,
         message: error['message'] as String,
@@ -447,9 +452,11 @@ class VideoPlayerApi {
 
   Future<void> setPreferredQuality(QualityMessage arg) async {
     final Object encoded = arg.encode();
-    const BasicMessageChannel<Object?> channel =
-        BasicMessageChannel<Object?>('dev.flutter.pigeon.VideoPlayerApi.setPreferredQuality', StandardMessageCodec());
-    final Map<Object, Object> replyMap = await channel.send(encoded) as Map<Object, Object>;
+    const BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.VideoPlayerApi.setPreferredQuality',
+        StandardMessageCodec());
+    final Map<Object, Object> replyMap =
+        await channel.send(encoded) as Map<Object, Object>;
     if (replyMap == null) {
       throw PlatformException(
         code: 'channel-error',

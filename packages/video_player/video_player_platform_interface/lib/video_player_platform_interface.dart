@@ -106,7 +106,7 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   }
 
   /// Sets the preferred quality of video stream
-  Future<void> setPreferredQuality(int widht, int height) {
+  Future<void> setPreferredQuality(int textureId, double width, double height) {
     throw UnimplementedError('setPreferredQuality() has not been implemented.');
   }
 }

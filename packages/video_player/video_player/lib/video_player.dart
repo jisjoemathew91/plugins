@@ -60,7 +60,8 @@ class VideoPlayerValue {
       : this(duration: Duration.zero, isInitialized: false);
 
   /// Returns an instance with the given [errorDescription].
-  VideoPlayerValue.erroneous(String errorDescription, String? holeErrorDescription)
+  VideoPlayerValue.erroneous(
+      String errorDescription, String? holeErrorDescription)
       : this(
             duration: Duration.zero,
             isInitialized: false,
@@ -224,13 +225,13 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// The name of the asset is given by the [dataSource] argument and must not be
   /// null. The [package] argument must be non-null when the asset comes from a
   /// package and null otherwise.
-  VideoPlayerController.asset(this.dataSource, {
+  VideoPlayerController.asset(
+    this.dataSource, {
     this.package,
     this.closedCaptionFile,
     this.videoPlayerOptions = const VideoPlayerOptions(),
     this.enableLog = false,
-  })
-      : dataSourceType = DataSourceType.asset,
+  })  : dataSourceType = DataSourceType.asset,
         formatHint = null,
         httpHeaders = const <String, String>{},
         super(VideoPlayerValue(duration: Duration.zero));
@@ -251,8 +252,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     this.videoPlayerOptions = const VideoPlayerOptions(),
     this.httpHeaders = const <String, String>{},
     this.enableLog = false,
-  })
-      : dataSourceType = DataSourceType.network,
+  })  : dataSourceType = DataSourceType.network,
         package = null,
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -260,12 +260,12 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   ///
   /// This will load the file from the file-URI given by:
   /// `'file://${file.path}'`.
-  VideoPlayerController.file(File file, {
+  VideoPlayerController.file(
+    File file, {
     this.closedCaptionFile,
     this.videoPlayerOptions = const VideoPlayerOptions(),
     this.enableLog = false,
-  })
-      : dataSource = 'file://${file.path}',
+  })  : dataSource = 'file://${file.path}',
         dataSourceType = DataSourceType.file,
         package = null,
         formatHint = null,
@@ -277,12 +277,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// This will load the video from the input content-URI.
   /// This is supported on Android only.
   VideoPlayerController.contentUri(
-      Uri contentUri, {
-        this.closedCaptionFile,
-        this.videoPlayerOptions = const VideoPlayerOptions(),
-        this.enableLog = false,
-      })
-      : assert(defaultTargetPlatform == TargetPlatform.android,
+    Uri contentUri, {
+    this.closedCaptionFile,
+    this.videoPlayerOptions = const VideoPlayerOptions(),
+    this.enableLog = false,
+  })  : assert(defaultTargetPlatform == TargetPlatform.android,
             'VideoPlayerController.contentUri is only supported on Android.'),
         dataSource = contentUri.toString(),
         dataSourceType = DataSourceType.contentUri,
@@ -709,8 +708,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   bool get _isDisposedOrNotInitialized => _isDisposed || !value.isInitialized;
 
   /// Sets preferred video stream quality
-  Future<void> setPreferredQuality(int width, int height) {
-    return _videoPlayerPlatform.setPreferredQuality(width, height);
+  Future<void> setPreferredQuality(double width, double height) {
+    return _videoPlayerPlatform.setPreferredQuality(_textureId, width, height);
   }
 }
 
