@@ -707,6 +707,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   }
 
   bool get _isDisposedOrNotInitialized => _isDisposed || !value.isInitialized;
+
+  /// Sets preferred video stream quality
+  Future<void> setPreferredQuality(int width, int height) {
+    return _videoPlayerPlatform.setPreferredQuality(width, height);
+  }
 }
 
 class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {
