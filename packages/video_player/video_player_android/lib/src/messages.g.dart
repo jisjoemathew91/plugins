@@ -288,13 +288,17 @@ class _AndroidVideoPlayerApiCodec extends StandardMessageCodec {
         return PositionMessage.decode(readValue(buffer)!);
 
       case 133:
-        return TextureMessage.decode(readValue(buffer)!);
+        return QualityMessage.decode(readValue(buffer)!);
 
       case 134:
+        return TextureMessage.decode(readValue(buffer)!);
+
+      case 135:
         return VolumeMessage.decode(readValue(buffer)!);
 
       default:
         return super.readValueOfType(type, buffer);
+
     }
   }
 }

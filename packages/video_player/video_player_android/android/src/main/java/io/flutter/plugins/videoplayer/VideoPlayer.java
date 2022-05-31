@@ -38,14 +38,14 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.view.TextureRegistry;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.flutter.plugin.common.EventChannel;
+import io.flutter.view.TextureRegistry;
 
 final class VideoPlayer {
   private static final String FORMAT_SS = "ss";
@@ -302,10 +302,9 @@ final class VideoPlayer {
     TrackSelector trackSelector = exoPlayer.getTrackSelector();
     if (trackSelector instanceof DefaultTrackSelector) {
       DefaultTrackSelector defaultTrackSelector = (DefaultTrackSelector) trackSelector;
-      DefaultTrackSelector.Parameters parameters = defaultTrackSelector.getParameters();
+      DefaultTrackSelector.ParametersBuilder builder = defaultTrackSelector.getParameters().buildUpon();
       defaultTrackSelector.setParameters(
-          parameters.buildUpon()
-              .setMaxVideoSize(widht, height)
+          builder.setMaxVideoSize(widht, height)
               .build()
       );
     }

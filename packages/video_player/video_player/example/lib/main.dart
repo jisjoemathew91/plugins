@@ -496,8 +496,7 @@ class _ExampleVideoState extends State<_ExampleVideo> {
               Text(
                   'dropped: ${_videoController.value.playbackMetrics?.framesDropped}'),
               Text('vfpoRate: ${_videoController.value.playbackMetrics?.vfpo}'),
-              Text(
-                  'format: ${_videoController.value.playbackMetrics?.videoMimeType}'),
+              Text('format: ${_videoController.value.playbackMetrics?.height}'),
               Text(
                   'bandwidthData: ${_videoController.value.playbackMetrics?.meanBandWidth}'),
             ]
