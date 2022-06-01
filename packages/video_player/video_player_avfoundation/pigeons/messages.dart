@@ -57,7 +57,7 @@ class CreateMessage {
 
 class BufferMessage {
   BufferMessage(this.forwardBufferDuration);
-  double forwardBufferDuration;
+  double? forwardBufferDuration;
 }
 
 class MixWithOthersMessage {
