@@ -185,10 +185,10 @@ class CreateMessage {
 
 class BufferMessage {
   BufferMessage({
-    required this.forwardBufferDuration,
+    this.forwardBufferDuration,
   });
 
-  double forwardBufferDuration;
+  double? forwardBufferDuration;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
@@ -199,7 +199,7 @@ class BufferMessage {
   static BufferMessage decode(Object message) {
     final Map<Object?, Object?> pigeonMap = message as Map<Object?, Object?>;
     return BufferMessage(
-      forwardBufferDuration: pigeonMap['forwardBufferDuration']! as double,
+      forwardBufferDuration: pigeonMap['forwardBufferDuration'] as double?,
     );
   }
 }

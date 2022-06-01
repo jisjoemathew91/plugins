@@ -211,7 +211,7 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 @end
 
 @implementation FLTBufferMessage
-+ (instancetype)makeWithForwardBufferDuration:(NSNumber *)forwardBufferDuration {
++ (instancetype)makeWithForwardBufferDuration:(nullable NSNumber *)forwardBufferDuration {
   FLTBufferMessage* pigeonResult = [[FLTBufferMessage alloc] init];
   pigeonResult.forwardBufferDuration = forwardBufferDuration;
   return pigeonResult;
@@ -219,7 +219,6 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 + (FLTBufferMessage *)fromMap:(NSDictionary *)dict {
   FLTBufferMessage *pigeonResult = [[FLTBufferMessage alloc] init];
   pigeonResult.forwardBufferDuration = GetNullableObject(dict, @"forwardBufferDuration");
-  NSAssert(pigeonResult.forwardBufferDuration != nil, @"");
   return pigeonResult;
 }
 - (NSDictionary *)toMap {

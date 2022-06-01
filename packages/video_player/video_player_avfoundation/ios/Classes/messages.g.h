@@ -86,10 +86,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface FLTBufferMessage : NSObject
-/// `init` unavailable to enforce nonnull fields, see the `make` class method.
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)makeWithForwardBufferDuration:(NSNumber *)forwardBufferDuration;
-@property(nonatomic, strong) NSNumber * forwardBufferDuration;
++ (instancetype)makeWithForwardBufferDuration:(nullable NSNumber *)forwardBufferDuration;
+@property(nonatomic, strong, nullable) NSNumber * forwardBufferDuration;
 @end
 
 @interface FLTMixWithOthersMessage : NSObject
