@@ -52,6 +52,12 @@ class CreateMessage {
   Map<String?, String?> httpHeaders;
   int? duration;
   bool? enableLog;
+  BufferMessage? bufferMessage;
+}
+
+class BufferMessage {
+  BufferMessage(this.forwardBufferDuration);
+  double forwardBufferDuration;
 }
 
 class MixWithOthersMessage {
