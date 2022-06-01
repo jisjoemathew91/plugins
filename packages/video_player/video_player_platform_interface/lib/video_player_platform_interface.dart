@@ -104,6 +104,11 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   Future<void> setMixWithOthers(bool mixWithOthers) {
     throw UnimplementedError('setMixWithOthers() has not been implemented.');
   }
+
+  /// Sets the preferred quality of video stream
+  Future<void> setPreferredQuality(int textureId, double width, double height) {
+    throw UnimplementedError('setPreferredQuality() has not been implemented.');
+  }
 }
 
 /// Description of the data source used to create an instance of
