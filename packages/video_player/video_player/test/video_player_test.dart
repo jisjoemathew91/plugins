@@ -68,10 +68,13 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
   Future<ClosedCaptionFile> get closedCaptionFile => _loadClosedCaption();
 
   @override
-  VideoPlayerOptions get videoPlayerOptions => const VideoPlayerOptions();
+  VideoPlayerOptions get videoPlayerOptions => VideoPlayerOptions();
 
   @override
   void setCaptionOffset(Duration delay) {}
+
+  @override
+  BufferOptions? get bufferOptions => null;
 
   @override
   bool get enableLog => false;

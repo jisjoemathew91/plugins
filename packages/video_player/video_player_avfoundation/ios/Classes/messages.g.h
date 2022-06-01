@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class FLTPlaybackSpeedMessage;
 @class FLTPositionMessage;
 @class FLTCreateMessage;
+@class FLTBufferMessage;
 @class FLTMixWithOthersMessage;
 @class FLTQualityMessage;
 
@@ -72,7 +73,8 @@ NS_ASSUME_NONNULL_BEGIN
     formatHint:(nullable NSString *)formatHint
     httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders
     duration:(nullable NSNumber *)duration
-    enableLog:(nullable NSNumber *)enableLog;
+    enableLog:(nullable NSNumber *)enableLog
+    bufferMessage:(nullable FLTBufferMessage *)bufferMessage;
 @property(nonatomic, copy, nullable) NSString * asset;
 @property(nonatomic, copy, nullable) NSString * uri;
 @property(nonatomic, copy, nullable) NSString * packageName;
@@ -80,6 +82,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong) NSDictionary<NSString *, NSString *> * httpHeaders;
 @property(nonatomic, strong, nullable) NSNumber * duration;
 @property(nonatomic, strong, nullable) NSNumber * enableLog;
+@property(nonatomic, strong, nullable) FLTBufferMessage * bufferMessage;
+@end
+
+@interface FLTBufferMessage : NSObject
+/// `init` unavailable to enforce nonnull fields, see the `make` class method.
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)makeWithForwardBufferDuration:(NSNumber *)forwardBufferDuration;
+@property(nonatomic, strong) NSNumber * forwardBufferDuration;
 @end
 
 @interface FLTMixWithOthersMessage : NSObject

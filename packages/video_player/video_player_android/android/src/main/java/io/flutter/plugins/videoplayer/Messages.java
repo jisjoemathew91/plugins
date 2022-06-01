@@ -313,6 +313,18 @@ public class Messages {
       this.formatHint = setterArg;
     }
 
+    private @Nullable Long duration;
+    public @Nullable Long getDuration() { return duration; }
+    public void setDuration(@Nullable Long setterArg) {
+      this.duration = setterArg;
+    }
+
+    private @Nullable Boolean enableLog;
+    public @Nullable Boolean getEnableLog() { return enableLog; }
+    public void setEnableLog(@Nullable Boolean setterArg) {
+      this.enableLog = setterArg;
+    }
+
     private @NonNull Map<String, String> httpHeaders;
     public @NonNull Map<String, String> getHttpHeaders() { return httpHeaders; }
     public void setHttpHeaders(@NonNull Map<String, String> setterArg) {
@@ -322,24 +334,10 @@ public class Messages {
       this.httpHeaders = setterArg;
     }
 
-    private Long duration;
-
-    public Long getDuration() {
-      return duration;
-    }
-
-    public void setDuration(Long setterArg) {
-      this.duration = setterArg;
-    }
-
-    private Boolean enableLog;
-
-    public Boolean getEnableLog() {
-      return enableLog;
-    }
-
-    public void setEnableLog(Boolean setterArg) {
-      this.enableLog = setterArg;
+    private @Nullable BufferMessage bufferMessage;
+    public @Nullable BufferMessage getBufferMessage() { return bufferMessage; }
+    public void setBufferMessage(@Nullable BufferMessage setterArg) {
+      this.bufferMessage = setterArg;
     }
 
     /** Constructor is private to enforce null safety; use Builder. */
@@ -365,35 +363,36 @@ public class Messages {
         this.formatHint = setterArg;
         return this;
       }
+      private @Nullable Long duration;
+      public @NonNull Builder setDuration(@Nullable Long setterArg) {
+        this.duration = setterArg;
+        return this;
+      }
+      private @Nullable Boolean enableLog;
+      public @NonNull Builder setEnableLog(@Nullable Boolean setterArg) {
+        this.enableLog = setterArg;
+        return this;
+      }
       private @Nullable Map<String, String> httpHeaders;
       public @NonNull Builder setHttpHeaders(@NonNull Map<String, String> setterArg) {
         this.httpHeaders = setterArg;
         return this;
       }
-
-      private @Nullable Long duration;
-
-      public @NonNull Builder setDuration(@NonNull Long setterArg) {
-        this.duration = setterArg;
+      private @Nullable BufferMessage bufferMessage;
+      public @NonNull Builder setBufferMessage(@Nullable BufferMessage setterArg) {
+        this.bufferMessage = setterArg;
         return this;
       }
-
-      private @Nullable Boolean enableLog;
-
-      public @NonNull Builder setEnableLog(@NonNull Boolean setterArg) {
-        this.enableLog = setterArg;
-        return this;
-      }
-
       public @NonNull CreateMessage build() {
         CreateMessage pigeonReturn = new CreateMessage();
         pigeonReturn.setAsset(asset);
         pigeonReturn.setUri(uri);
         pigeonReturn.setPackageName(packageName);
         pigeonReturn.setFormatHint(formatHint);
-        pigeonReturn.setHttpHeaders(httpHeaders);
         pigeonReturn.setDuration(duration);
         pigeonReturn.setEnableLog(enableLog);
+        pigeonReturn.setHttpHeaders(httpHeaders);
+        pigeonReturn.setBufferMessage(bufferMessage);
         return pigeonReturn;
       }
     }
@@ -403,13 +402,13 @@ public class Messages {
       toMapResult.put("uri", uri);
       toMapResult.put("packageName", packageName);
       toMapResult.put("formatHint", formatHint);
-      toMapResult.put("httpHeaders", httpHeaders);
       toMapResult.put("duration", duration);
       toMapResult.put("enableLog", enableLog);
+      toMapResult.put("httpHeaders", httpHeaders);
+      toMapResult.put("bufferMessage", (bufferMessage == null) ? null : bufferMessage.toMap());
       return toMapResult;
     }
     static @NonNull CreateMessage fromMap(@NonNull Map<String, Object> map) {
-      map.forEach((key, value) -> System.out.println(key + ":" + value));
       CreateMessage pigeonResult = new CreateMessage();
       Object asset = map.get("asset");
       pigeonResult.setAsset((String)asset);
@@ -419,15 +418,122 @@ public class Messages {
       pigeonResult.setPackageName((String)packageName);
       Object formatHint = map.get("formatHint");
       pigeonResult.setFormatHint((String)formatHint);
-      Object httpHeaders = map.get("httpHeaders");
-      pigeonResult.setHttpHeaders((Map<String, String>) httpHeaders);
       Object duration = map.get("duration");
-      pigeonResult.duration =
-              (duration == null)
-                      ? null
-                      : ((duration instanceof Integer) ? (Integer) duration : (Long) duration);
+      pigeonResult.setDuration((duration == null) ? null : ((duration instanceof Integer) ? (Integer)duration : (Long)duration));
       Object enableLog = map.get("enableLog");
-      pigeonResult.enableLog = (Boolean) enableLog;
+      pigeonResult.setEnableLog((Boolean)enableLog);
+      Object httpHeaders = map.get("httpHeaders");
+      pigeonResult.setHttpHeaders((Map<String, String>)httpHeaders);
+      Object bufferMessage = map.get("bufferMessage");
+      pigeonResult.setBufferMessage((bufferMessage == null) ? null : BufferMessage.fromMap((Map)bufferMessage));
+      return pigeonResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static class BufferMessage {
+    private @Nullable Long minBufferMs;
+    public @Nullable Long getMinBufferMs() { return minBufferMs; }
+    public void setMinBufferMs(@Nullable Long setterArg) {
+      this.minBufferMs = setterArg;
+    }
+
+    private @Nullable Long maxBufferMs;
+    public @Nullable Long getMaxBufferMs() { return maxBufferMs; }
+    public void setMaxBufferMs(@Nullable Long setterArg) {
+      this.maxBufferMs = setterArg;
+    }
+
+    private @Nullable Long bufferForPlaybackMs;
+    public @Nullable Long getBufferForPlaybackMs() { return bufferForPlaybackMs; }
+    public void setBufferForPlaybackMs(@Nullable Long setterArg) {
+      this.bufferForPlaybackMs = setterArg;
+    }
+
+    private @Nullable Long bufferForPlaybackAfterRebufferMs;
+    public @Nullable Long getBufferForPlaybackAfterRebufferMs() { return bufferForPlaybackAfterRebufferMs; }
+    public void setBufferForPlaybackAfterRebufferMs(@Nullable Long setterArg) {
+      this.bufferForPlaybackAfterRebufferMs = setterArg;
+    }
+
+    private @Nullable Long backBufferDurationMs;
+    public @Nullable Long getBackBufferDurationMs() { return backBufferDurationMs; }
+    public void setBackBufferDurationMs(@Nullable Long setterArg) {
+      this.backBufferDurationMs = setterArg;
+    }
+
+    private @Nullable Boolean retainBackBufferFromKeyframe;
+    public @Nullable Boolean getRetainBackBufferFromKeyframe() { return retainBackBufferFromKeyframe; }
+    public void setRetainBackBufferFromKeyframe(@Nullable Boolean setterArg) {
+      this.retainBackBufferFromKeyframe = setterArg;
+    }
+
+    public static final class Builder {
+      private @Nullable Long minBufferMs;
+      public @NonNull Builder setMinBufferMs(@Nullable Long setterArg) {
+        this.minBufferMs = setterArg;
+        return this;
+      }
+      private @Nullable Long maxBufferMs;
+      public @NonNull Builder setMaxBufferMs(@Nullable Long setterArg) {
+        this.maxBufferMs = setterArg;
+        return this;
+      }
+      private @Nullable Long bufferForPlaybackMs;
+      public @NonNull Builder setBufferForPlaybackMs(@Nullable Long setterArg) {
+        this.bufferForPlaybackMs = setterArg;
+        return this;
+      }
+      private @Nullable Long bufferForPlaybackAfterRebufferMs;
+      public @NonNull Builder setBufferForPlaybackAfterRebufferMs(@Nullable Long setterArg) {
+        this.bufferForPlaybackAfterRebufferMs = setterArg;
+        return this;
+      }
+      private @Nullable Long backBufferDurationMs;
+      public @NonNull Builder setBackBufferDurationMs(@Nullable Long setterArg) {
+        this.backBufferDurationMs = setterArg;
+        return this;
+      }
+      private @Nullable Boolean retainBackBufferFromKeyframe;
+      public @NonNull Builder setRetainBackBufferFromKeyframe(@Nullable Boolean setterArg) {
+        this.retainBackBufferFromKeyframe = setterArg;
+        return this;
+      }
+      public @NonNull BufferMessage build() {
+        BufferMessage pigeonReturn = new BufferMessage();
+        pigeonReturn.setMinBufferMs(minBufferMs);
+        pigeonReturn.setMaxBufferMs(maxBufferMs);
+        pigeonReturn.setBufferForPlaybackMs(bufferForPlaybackMs);
+        pigeonReturn.setBufferForPlaybackAfterRebufferMs(bufferForPlaybackAfterRebufferMs);
+        pigeonReturn.setBackBufferDurationMs(backBufferDurationMs);
+        pigeonReturn.setRetainBackBufferFromKeyframe(retainBackBufferFromKeyframe);
+        return pigeonReturn;
+      }
+    }
+    @NonNull Map<String, Object> toMap() {
+      Map<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("minBufferMs", minBufferMs);
+      toMapResult.put("maxBufferMs", maxBufferMs);
+      toMapResult.put("bufferForPlaybackMs", bufferForPlaybackMs);
+      toMapResult.put("bufferForPlaybackAfterRebufferMs", bufferForPlaybackAfterRebufferMs);
+      toMapResult.put("backBufferDurationMs", backBufferDurationMs);
+      toMapResult.put("retainBackBufferFromKeyframe", retainBackBufferFromKeyframe);
+      return toMapResult;
+    }
+    static @NonNull BufferMessage fromMap(@NonNull Map<String, Object> map) {
+      BufferMessage pigeonResult = new BufferMessage();
+      Object minBufferMs = map.get("minBufferMs");
+      pigeonResult.setMinBufferMs((minBufferMs == null) ? null : ((minBufferMs instanceof Integer) ? (Integer)minBufferMs : (Long)minBufferMs));
+      Object maxBufferMs = map.get("maxBufferMs");
+      pigeonResult.setMaxBufferMs((maxBufferMs == null) ? null : ((maxBufferMs instanceof Integer) ? (Integer)maxBufferMs : (Long)maxBufferMs));
+      Object bufferForPlaybackMs = map.get("bufferForPlaybackMs");
+      pigeonResult.setBufferForPlaybackMs((bufferForPlaybackMs == null) ? null : ((bufferForPlaybackMs instanceof Integer) ? (Integer)bufferForPlaybackMs : (Long)bufferForPlaybackMs));
+      Object bufferForPlaybackAfterRebufferMs = map.get("bufferForPlaybackAfterRebufferMs");
+      pigeonResult.setBufferForPlaybackAfterRebufferMs((bufferForPlaybackAfterRebufferMs == null) ? null : ((bufferForPlaybackAfterRebufferMs instanceof Integer) ? (Integer)bufferForPlaybackAfterRebufferMs : (Long)bufferForPlaybackAfterRebufferMs));
+      Object backBufferDurationMs = map.get("backBufferDurationMs");
+      pigeonResult.setBackBufferDurationMs((backBufferDurationMs == null) ? null : ((backBufferDurationMs instanceof Integer) ? (Integer)backBufferDurationMs : (Long)backBufferDurationMs));
+      Object retainBackBufferFromKeyframe = map.get("retainBackBufferFromKeyframe");
+      pigeonResult.setRetainBackBufferFromKeyframe((Boolean)retainBackBufferFromKeyframe);
       return pigeonResult;
     }
   }
@@ -550,27 +656,30 @@ public class Messages {
     protected Object readValueOfType(byte type, ByteBuffer buffer) {
       switch (type) {
         case (byte)128:         
-          return CreateMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return BufferMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)129:         
-          return LoopingMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return CreateMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)130:         
-          return MixWithOthersMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return LoopingMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)131:         
-          return PlaybackSpeedMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return MixWithOthersMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)132:         
-          return PositionMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return PlaybackSpeedMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)133:         
-          return QualityMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return PositionMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)134:         
-          return TextureMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return QualityMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)135:         
+          return TextureMessage.fromMap((Map<String, Object>) readValue(buffer));
+        
+        case (byte)136:         
           return VolumeMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         default:        
@@ -580,36 +689,40 @@ public class Messages {
     }
     @Override
     protected void writeValue(ByteArrayOutputStream stream, Object value)     {
-      if (value instanceof CreateMessage) {
+      if (value instanceof BufferMessage) {
         stream.write(128);
+        writeValue(stream, ((BufferMessage) value).toMap());
+      } else 
+      if (value instanceof CreateMessage) {
+        stream.write(129);
         writeValue(stream, ((CreateMessage) value).toMap());
       } else 
       if (value instanceof LoopingMessage) {
-        stream.write(129);
+        stream.write(130);
         writeValue(stream, ((LoopingMessage) value).toMap());
       } else 
       if (value instanceof MixWithOthersMessage) {
-        stream.write(130);
+        stream.write(131);
         writeValue(stream, ((MixWithOthersMessage) value).toMap());
       } else 
       if (value instanceof PlaybackSpeedMessage) {
-        stream.write(131);
+        stream.write(132);
         writeValue(stream, ((PlaybackSpeedMessage) value).toMap());
       } else 
       if (value instanceof PositionMessage) {
-        stream.write(132);
+        stream.write(133);
         writeValue(stream, ((PositionMessage) value).toMap());
       } else 
       if (value instanceof QualityMessage) {
-        stream.write(133);
+        stream.write(134);
         writeValue(stream, ((QualityMessage) value).toMap());
       } else 
       if (value instanceof TextureMessage) {
-        stream.write(134);
+        stream.write(135);
         writeValue(stream, ((TextureMessage) value).toMap());
       } else 
       if (value instanceof VolumeMessage) {
-        stream.write(135);
+        stream.write(136);
         writeValue(stream, ((VolumeMessage) value).toMap());
       } else 
 {

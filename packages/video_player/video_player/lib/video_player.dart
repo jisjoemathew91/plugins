@@ -14,7 +14,14 @@ import 'package:video_player_platform_interface/video_player_platform_interface.
 import 'src/closed_caption_file.dart';
 
 export 'package:video_player_platform_interface/video_player_platform_interface.dart'
-    show DurationRange, DataSourceType, VideoFormat, VideoPlayerOptions;
+    show
+        DurationRange,
+        DataSourceType,
+        VideoFormat,
+        VideoPlayerOptions,
+        BufferOptions,
+        BufferAndroidPlatformOptions,
+        BufferIosPlatformOptions;
 
 export 'src/closed_caption_file.dart';
 
@@ -233,6 +240,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     this.enableLog = false,
   })  : dataSourceType = DataSourceType.asset,
         formatHint = null,
+        bufferOptions = null,
         httpHeaders = const <String, String>{},
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -249,6 +257,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     this.dataSource, {
     this.formatHint,
     this.closedCaptionFile,
+    this.bufferOptions,
     this.videoPlayerOptions = const VideoPlayerOptions(),
     this.httpHeaders = const <String, String>{},
     this.enableLog = false,
@@ -269,6 +278,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
         dataSourceType = DataSourceType.file,
         package = null,
         formatHint = null,
+        bufferOptions = null,
         httpHeaders = const <String, String>{},
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -287,6 +297,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
         dataSourceType = DataSourceType.contentUri,
         package = null,
         formatHint = null,
+        bufferOptions = null,
         httpHeaders = const <String, String>{},
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -309,6 +320,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
 
   /// Provide additional configuration options (optional). Like setting the audio mode to mix
   final VideoPlayerOptions videoPlayerOptions;
+
+  /// Video player's options for buffering.
+  final BufferOptions? bufferOptions;
 
   /// Only set for [asset] videos. The package that the asset was loaded from.
   final String? package;
@@ -368,6 +382,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           httpHeaders: httpHeaders,
           duration: duration,
           enableLog: enableLog,
+          bufferOptions: bufferOptions,
         );
         break;
       case DataSourceType.file:

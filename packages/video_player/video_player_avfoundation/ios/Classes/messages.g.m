@@ -58,6 +58,10 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 + (FLTCreateMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
 @end
+@interface FLTBufferMessage ()
++ (FLTBufferMessage *)fromMap:(NSDictionary *)dict;
+- (NSDictionary *)toMap;
+@end
 @interface FLTMixWithOthersMessage ()
 + (FLTMixWithOthersMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
@@ -175,7 +179,8 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
     formatHint:(nullable NSString *)formatHint
     httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders
     duration:(nullable NSNumber *)duration
-    enableLog:(nullable NSNumber *)enableLog {
+    enableLog:(nullable NSNumber *)enableLog
+    bufferMessage:(nullable FLTBufferMessage *)bufferMessage {
   FLTCreateMessage* pigeonResult = [[FLTCreateMessage alloc] init];
   pigeonResult.asset = asset;
   pigeonResult.uri = uri;
@@ -184,6 +189,7 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
   pigeonResult.httpHeaders = httpHeaders;
   pigeonResult.duration = duration;
   pigeonResult.enableLog = enableLog;
+  pigeonResult.bufferMessage = bufferMessage;
   return pigeonResult;
 }
 + (FLTCreateMessage *)fromMap:(NSDictionary *)dict {
@@ -196,10 +202,28 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
   NSAssert(pigeonResult.httpHeaders != nil, @"");
   pigeonResult.duration = GetNullableObject(dict, @"duration");
   pigeonResult.enableLog = GetNullableObject(dict, @"enableLog");
+  pigeonResult.bufferMessage = [FLTBufferMessage fromMap:GetNullableObject(dict, @"bufferMessage")];
   return pigeonResult;
 }
 - (NSDictionary *)toMap {
-  return [NSDictionary dictionaryWithObjectsAndKeys:(self.asset ? self.asset : [NSNull null]), @"asset", (self.uri ? self.uri : [NSNull null]), @"uri", (self.packageName ? self.packageName : [NSNull null]), @"packageName", (self.formatHint ? self.formatHint : [NSNull null]), @"formatHint", (self.httpHeaders ? self.httpHeaders : [NSNull null]), @"httpHeaders", (self.duration ? self.duration : [NSNull null]), @"duration", (self.enableLog ? self.enableLog : [NSNull null]), @"enableLog", nil];
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.asset ? self.asset : [NSNull null]), @"asset", (self.uri ? self.uri : [NSNull null]), @"uri", (self.packageName ? self.packageName : [NSNull null]), @"packageName", (self.formatHint ? self.formatHint : [NSNull null]), @"formatHint", (self.httpHeaders ? self.httpHeaders : [NSNull null]), @"httpHeaders", (self.duration ? self.duration : [NSNull null]), @"duration", (self.enableLog ? self.enableLog : [NSNull null]), @"enableLog", (self.bufferMessage ? [self.bufferMessage toMap] : [NSNull null]), @"bufferMessage", nil];
+}
+@end
+
+@implementation FLTBufferMessage
++ (instancetype)makeWithForwardBufferDuration:(NSNumber *)forwardBufferDuration {
+  FLTBufferMessage* pigeonResult = [[FLTBufferMessage alloc] init];
+  pigeonResult.forwardBufferDuration = forwardBufferDuration;
+  return pigeonResult;
+}
++ (FLTBufferMessage *)fromMap:(NSDictionary *)dict {
+  FLTBufferMessage *pigeonResult = [[FLTBufferMessage alloc] init];
+  pigeonResult.forwardBufferDuration = GetNullableObject(dict, @"forwardBufferDuration");
+  NSAssert(pigeonResult.forwardBufferDuration != nil, @"");
+  return pigeonResult;
+}
+- (NSDictionary *)toMap {
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.forwardBufferDuration ? self.forwardBufferDuration : [NSNull null]), @"forwardBufferDuration", nil];
 }
 @end
 
@@ -252,27 +276,30 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 {
   switch (type) {
     case 128:     
-      return [FLTCreateMessage fromMap:[self readValue]];
+      return [FLTBufferMessage fromMap:[self readValue]];
     
     case 129:     
-      return [FLTLoopingMessage fromMap:[self readValue]];
+      return [FLTCreateMessage fromMap:[self readValue]];
     
     case 130:     
-      return [FLTMixWithOthersMessage fromMap:[self readValue]];
+      return [FLTLoopingMessage fromMap:[self readValue]];
     
     case 131:     
-      return [FLTPlaybackSpeedMessage fromMap:[self readValue]];
+      return [FLTMixWithOthersMessage fromMap:[self readValue]];
     
     case 132:     
-      return [FLTPositionMessage fromMap:[self readValue]];
+      return [FLTPlaybackSpeedMessage fromMap:[self readValue]];
     
     case 133:     
-      return [FLTQualityMessage fromMap:[self readValue]];
+      return [FLTPositionMessage fromMap:[self readValue]];
     
     case 134:     
-      return [FLTTextureMessage fromMap:[self readValue]];
+      return [FLTQualityMessage fromMap:[self readValue]];
     
     case 135:     
+      return [FLTTextureMessage fromMap:[self readValue]];
+    
+    case 136:     
       return [FLTVolumeMessage fromMap:[self readValue]];
     
     default:    
@@ -287,36 +314,40 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 @implementation FLTAVFoundationVideoPlayerApiCodecWriter
 - (void)writeValue:(id)value 
 {
-  if ([value isKindOfClass:[FLTCreateMessage class]]) {
+  if ([value isKindOfClass:[FLTBufferMessage class]]) {
     [self writeByte:128];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTLoopingMessage class]]) {
+  if ([value isKindOfClass:[FLTCreateMessage class]]) {
     [self writeByte:129];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTMixWithOthersMessage class]]) {
+  if ([value isKindOfClass:[FLTLoopingMessage class]]) {
     [self writeByte:130];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTPlaybackSpeedMessage class]]) {
+  if ([value isKindOfClass:[FLTMixWithOthersMessage class]]) {
     [self writeByte:131];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTPositionMessage class]]) {
+  if ([value isKindOfClass:[FLTPlaybackSpeedMessage class]]) {
     [self writeByte:132];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTQualityMessage class]]) {
+  if ([value isKindOfClass:[FLTPositionMessage class]]) {
     [self writeByte:133];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTTextureMessage class]]) {
+  if ([value isKindOfClass:[FLTQualityMessage class]]) {
     [self writeByte:134];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTVolumeMessage class]]) {
+  if ([value isKindOfClass:[FLTTextureMessage class]]) {
     [self writeByte:135];
+    [self writeValue:[value toMap]];
+  } else 
+  if ([value isKindOfClass:[FLTVolumeMessage class]]) {
+    [self writeByte:136];
     [self writeValue:[value toMap]];
   } else 
 {

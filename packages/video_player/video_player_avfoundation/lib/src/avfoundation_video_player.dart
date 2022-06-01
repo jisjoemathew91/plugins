@@ -38,8 +38,7 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
     String? uri;
     String? formatHint;
     Map<String, String> httpHeaders = <String, String>{};
-    int? duration;
-    bool? enableLog;
+    BufferMessage? bufferMessage;
     switch (dataSource.sourceType) {
       case DataSourceType.asset:
         asset = dataSource.asset;
@@ -49,6 +48,15 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
         uri = dataSource.uri;
         formatHint = _videoFormatStringMap[dataSource.formatHint];
         httpHeaders = dataSource.httpHeaders;
+
+        final BufferIosPlatformOptions? bufferOptions =
+            dataSource.bufferOptions?.iosPlatformOptions;
+        if (bufferOptions != null) {
+          bufferMessage = BufferMessage(
+            forwardBufferDuration:
+                bufferOptions.preferredForwardBuffer.inMilliseconds / 1000,
+          );
+        }
         break;
       case DataSourceType.file:
         uri = dataSource.uri;
@@ -63,10 +71,10 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
       uri: uri,
       httpHeaders: httpHeaders,
       formatHint: formatHint,
+      duration: dataSource.duration?.inMilliseconds,
+      enableLog: dataSource.enableLog,
+      bufferMessage: bufferMessage,
     );
-
-    message.duration = dataSource.duration?.inMilliseconds;
-    message.enableLog = dataSource.enableLog;
 
     final TextureMessage response = await _api.create(message);
     return response.textureId;

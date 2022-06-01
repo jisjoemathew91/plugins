@@ -45,6 +45,7 @@
 @property(assign, nonatomic) BOOL isLoggingEnabled;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
+               forwardBufferDuration: (double)bufferDuration
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers;
 @end
 
@@ -59,7 +60,7 @@ static void *playbackBufferFullContext = &playbackBufferFullContext;
 @implementation FLTVideoPlayer
 - (instancetype)initWithAsset:(NSString *)asset frameUpdater:(FLTFrameUpdater *)frameUpdater {
   NSString *path = [[NSBundle mainBundle] pathForResource:asset ofType:nil];
-  return [self initWithURL:[NSURL fileURLWithPath:path] frameUpdater:frameUpdater httpHeaders:@{}];
+  return [self initWithURL:[NSURL fileURLWithPath:path] frameUpdater:frameUpdater forwardBufferDuration:0.0 httpHeaders:@{}];
 }
 
 - (void)addObservers:(AVPlayerItem *)item {
@@ -228,7 +229,8 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (instancetype)initWithURL:(NSURL *)url
-               frameUpdater:(FLTFrameUpdater *)frameUpdater
+                frameUpdater:(FLTFrameUpdater *)frameUpdater
+                forwardBufferDuration: (double)bufferDuration
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers {
   NSDictionary<NSString *, id> *options = nil;
   if ([headers count] != 0) {
@@ -236,6 +238,11 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   }
   AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:options];
   AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:urlAsset];
+
+  if (bufferDuration != 0.0) {
+    item.preferredForwardBufferDuration = bufferDuration;
+  }
+
   [self log:[NSString stringWithFormat:@"Player created (url: '%@', headers: '%@')", url.absoluteString, headers]];
   return [self initWithPlayerItem:item frameUpdater:frameUpdater];
 }
@@ -662,8 +669,13 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     player.isLoggingEnabled = input.enableLog.boolValue;
     return [self onPlayerSetup:player frameUpdater:frameUpdater];
   } else if (input.uri) {
+    double forwardBufferDuration = 0.0;
+    if (input.bufferMessage != nil) {
+      forwardBufferDuration = input.bufferMessage.forwardBufferDuration.doubleValue;
+    }
     player = [[FLTVideoPlayer alloc] initWithURL:[NSURL URLWithString:input.uri]
                                     frameUpdater:frameUpdater
+                                    forwardBufferDuration: forwardBufferDuration
                                      httpHeaders:input.httpHeaders];
     if (input.duration.intValue > 0)
       player.startTime = input.duration.intValue;
@@ -749,7 +761,6 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 - (void)setPreferredQuality:(nonnull FLTQualityMessage *)msg error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
   FLTVideoPlayer *player = self.playersByTextureId[msg.textureId];
   if (@available(iOS 11.0, *)) {
-    NSLog(@"setPreferredQuality: %f, %f", msg.width.floatValue, msg.height.floatValue);
     CGSize size = CGSizeMake(msg.width.floatValue, msg.height.floatValue);
     player.player.currentItem.preferredMaximumResolution = size;
   } else {
