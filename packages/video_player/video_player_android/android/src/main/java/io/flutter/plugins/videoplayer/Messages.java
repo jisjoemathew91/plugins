@@ -575,6 +575,80 @@ public class Messages {
       return pigeonResult;
     }
   }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static class QualityMessage {
+    private @NonNull Long textureId;
+    public @NonNull Long getTextureId() { return textureId; }
+    public void setTextureId(@NonNull Long setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"textureId\" is null.");
+      }
+      this.textureId = setterArg;
+    }
+
+    private @NonNull Double width;
+    public @NonNull Double getWidth() { return width; }
+    public void setWidth(@NonNull Double setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"width\" is null.");
+      }
+      this.width = setterArg;
+    }
+
+    private @NonNull Double height;
+    public @NonNull Double getHeight() { return height; }
+    public void setHeight(@NonNull Double setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"height\" is null.");
+      }
+      this.height = setterArg;
+    }
+
+    /** Constructor is private to enforce null safety; use Builder. */
+    private QualityMessage() {}
+    public static final class Builder {
+      private @Nullable Long textureId;
+      public @NonNull Builder setTextureId(@NonNull Long setterArg) {
+        this.textureId = setterArg;
+        return this;
+      }
+      private @Nullable Double width;
+      public @NonNull Builder setWidth(@NonNull Double setterArg) {
+        this.width = setterArg;
+        return this;
+      }
+      private @Nullable Double height;
+      public @NonNull Builder setHeight(@NonNull Double setterArg) {
+        this.height = setterArg;
+        return this;
+      }
+      public @NonNull QualityMessage build() {
+        QualityMessage pigeonReturn = new QualityMessage();
+        pigeonReturn.setTextureId(textureId);
+        pigeonReturn.setWidth(width);
+        pigeonReturn.setHeight(height);
+        return pigeonReturn;
+      }
+    }
+    @NonNull Map<String, Object> toMap() {
+      Map<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("textureId", textureId);
+      toMapResult.put("width", width);
+      toMapResult.put("height", height);
+      return toMapResult;
+    }
+    static @NonNull QualityMessage fromMap(@NonNull Map<String, Object> map) {
+      QualityMessage pigeonResult = new QualityMessage();
+      Object textureId = map.get("textureId");
+      pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer)textureId : (Long)textureId));
+      Object width = map.get("width");
+      pigeonResult.setWidth((Double)width);
+      Object height = map.get("height");
+      pigeonResult.setHeight((Double)height);
+      return pigeonResult;
+    }
+  }
   private static class AndroidVideoPlayerApiCodec extends StandardMessageCodec {
     public static final AndroidVideoPlayerApiCodec INSTANCE = new AndroidVideoPlayerApiCodec();
     private AndroidVideoPlayerApiCodec() {}
@@ -600,9 +674,12 @@ public class Messages {
           return PositionMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)134:         
-          return TextureMessage.fromMap((Map<String, Object>) readValue(buffer));
+          return QualityMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         case (byte)135:         
+          return TextureMessage.fromMap((Map<String, Object>) readValue(buffer));
+        
+        case (byte)136:         
           return VolumeMessage.fromMap((Map<String, Object>) readValue(buffer));
         
         default:        
@@ -636,12 +713,16 @@ public class Messages {
         stream.write(133);
         writeValue(stream, ((PositionMessage) value).toMap());
       } else 
-      if (value instanceof TextureMessage) {
+      if (value instanceof QualityMessage) {
         stream.write(134);
+        writeValue(stream, ((QualityMessage) value).toMap());
+      } else 
+      if (value instanceof TextureMessage) {
+        stream.write(135);
         writeValue(stream, ((TextureMessage) value).toMap());
       } else 
       if (value instanceof VolumeMessage) {
-        stream.write(135);
+        stream.write(136);
         writeValue(stream, ((VolumeMessage) value).toMap());
       } else 
 {
@@ -663,6 +744,7 @@ public class Messages {
     void seekTo(@NonNull PositionMessage msg);
     void pause(@NonNull TextureMessage msg);
     void setMixWithOthers(@NonNull MixWithOthersMessage msg);
+    void setPreferredQuality(@NonNull QualityMessage msg);
 
     /** The codec used by AndroidVideoPlayerApi. */
     static MessageCodec<Object> getCodec() {
@@ -919,6 +1001,30 @@ public class Messages {
                 throw new NullPointerException("msgArg unexpectedly null.");
               }
               api.setMixWithOthers(msgArg);
+              wrapped.put("result", null);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.setPreferredQuality", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              ArrayList<Object> args = (ArrayList<Object>)message;
+              QualityMessage msgArg = (QualityMessage)args.get(0);
+              if (msgArg == null) {
+                throw new NullPointerException("msgArg unexpectedly null.");
+              }
+              api.setPreferredQuality(msgArg);
               wrapped.put("result", null);
             }
             catch (Error | RuntimeException exception) {

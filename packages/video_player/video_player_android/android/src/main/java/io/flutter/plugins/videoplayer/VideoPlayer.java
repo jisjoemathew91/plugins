@@ -32,6 +32,7 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
@@ -340,6 +341,18 @@ final class VideoPlayer {
 
   void seekTo(int location) {
     exoPlayer.seekTo(location);
+  }
+
+  void setPreferredVideoSize(int widht, int height) {
+    TrackSelector trackSelector = exoPlayer.getTrackSelector();
+    if (trackSelector instanceof DefaultTrackSelector) {
+      DefaultTrackSelector defaultTrackSelector = (DefaultTrackSelector) trackSelector;
+      DefaultTrackSelector.ParametersBuilder builder = defaultTrackSelector.getParameters().buildUpon();
+      defaultTrackSelector.setParameters(
+          builder.setMaxVideoSize(widht, height)
+              .build()
+      );
+    }
   }
 
   long getPosition() {
