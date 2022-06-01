@@ -66,6 +66,10 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 + (FLTMixWithOthersMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
 @end
+@interface FLTQualityMessage ()
++ (FLTQualityMessage *)fromMap:(NSDictionary *)dict;
+- (NSDictionary *)toMap;
+@end
 
 @implementation FLTTextureMessage
 + (instancetype)makeWithTextureId:(NSNumber *)textureId {
@@ -240,6 +244,31 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 }
 @end
 
+@implementation FLTQualityMessage
++ (instancetype)makeWithTextureId:(NSNumber *)textureId
+    width:(NSNumber *)width
+    height:(NSNumber *)height {
+  FLTQualityMessage* pigeonResult = [[FLTQualityMessage alloc] init];
+  pigeonResult.textureId = textureId;
+  pigeonResult.width = width;
+  pigeonResult.height = height;
+  return pigeonResult;
+}
++ (FLTQualityMessage *)fromMap:(NSDictionary *)dict {
+  FLTQualityMessage *pigeonResult = [[FLTQualityMessage alloc] init];
+  pigeonResult.textureId = GetNullableObject(dict, @"textureId");
+  NSAssert(pigeonResult.textureId != nil, @"");
+  pigeonResult.width = GetNullableObject(dict, @"width");
+  NSAssert(pigeonResult.width != nil, @"");
+  pigeonResult.height = GetNullableObject(dict, @"height");
+  NSAssert(pigeonResult.height != nil, @"");
+  return pigeonResult;
+}
+- (NSDictionary *)toMap {
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.textureId ? self.textureId : [NSNull null]), @"textureId", (self.width ? self.width : [NSNull null]), @"width", (self.height ? self.height : [NSNull null]), @"height", nil];
+}
+@end
+
 @interface FLTAVFoundationVideoPlayerApiCodecReader : FlutterStandardReader
 @end
 @implementation FLTAVFoundationVideoPlayerApiCodecReader
@@ -265,9 +294,12 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
       return [FLTPositionMessage fromMap:[self readValue]];
     
     case 134:     
-      return [FLTTextureMessage fromMap:[self readValue]];
+      return [FLTQualityMessage fromMap:[self readValue]];
     
     case 135:     
+      return [FLTTextureMessage fromMap:[self readValue]];
+    
+    case 136:     
       return [FLTVolumeMessage fromMap:[self readValue]];
     
     default:    
@@ -306,12 +338,16 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
     [self writeByte:133];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTTextureMessage class]]) {
+  if ([value isKindOfClass:[FLTQualityMessage class]]) {
     [self writeByte:134];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTVolumeMessage class]]) {
+  if ([value isKindOfClass:[FLTTextureMessage class]]) {
     [self writeByte:135];
+    [self writeValue:[value toMap]];
+  } else 
+  if ([value isKindOfClass:[FLTVolumeMessage class]]) {
+    [self writeByte:136];
     [self writeValue:[value toMap]];
   } else 
 {
@@ -554,6 +590,26 @@ void FLTAVFoundationVideoPlayerApiSetup(id<FlutterBinaryMessenger> binaryMesseng
         FLTMixWithOthersMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
         FlutterError *error;
         [api setMixWithOthers:arg_msg error:&error];
+        callback(wrapResult(nil, error));
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [[FlutterBasicMessageChannel alloc]
+        initWithName:@"dev.flutter.pigeon.AVFoundationVideoPlayerApi.setPreferredQuality"
+        binaryMessenger:binaryMessenger
+        codec:FLTAVFoundationVideoPlayerApiGetCodec()        ];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(setPreferredQuality:error:)], @"FLTAVFoundationVideoPlayerApi api (%@) doesn't respond to @selector(setPreferredQuality:error:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        NSArray *args = message;
+        FLTQualityMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
+        FlutterError *error;
+        [api setPreferredQuality:arg_msg error:&error];
         callback(wrapResult(nil, error));
       }];
     }
