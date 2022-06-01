@@ -50,7 +50,7 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
   Future<void> setPlaybackSpeed(double speed) async {}
 
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize({Duration duration = Duration.zero}) async {}
 
   @override
   Future<void> pause() async {}
@@ -68,10 +68,21 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
   Future<ClosedCaptionFile> get closedCaptionFile => _loadClosedCaption();
 
   @override
-  VideoPlayerOptions? get videoPlayerOptions => null;
+  VideoPlayerOptions get videoPlayerOptions => VideoPlayerOptions();
 
   @override
   void setCaptionOffset(Duration delay) {}
+
+  @override
+  BufferOptions? get bufferOptions => null;
+
+  @override
+  bool get enableLog => false;
+
+  @override
+  Future<void> setPreferredQuality(double width, double height) {
+    return Future<void>.value();
+  }
 }
 
 Future<ClosedCaptionFile> _loadClosedCaption() async =>
@@ -779,7 +790,8 @@ void main() {
 
     test('erroneous()', () {
       const String errorMessage = 'foo';
-      final VideoPlayerValue error = VideoPlayerValue.erroneous(errorMessage, null);
+      final VideoPlayerValue error =
+          VideoPlayerValue.erroneous(errorMessage, null);
 
       expect(error.duration, equals(Duration.zero));
       expect(error.position, equals(Duration.zero));
@@ -855,13 +867,15 @@ void main() {
         expect(exactCopy.toString(), original.toString());
       });
       test('errorDescription is not persisted when copy with null', () {
-        final VideoPlayerValue original = VideoPlayerValue.erroneous('error', null);
+        final VideoPlayerValue original =
+            VideoPlayerValue.erroneous('error', null);
         final VideoPlayerValue copy = original.copyWith(errorDescription: null);
 
         expect(copy.errorDescription, null);
       });
       test('errorDescription is changed when copy with another error', () {
-        final VideoPlayerValue original = VideoPlayerValue.erroneous('error', null);
+        final VideoPlayerValue original =
+            VideoPlayerValue.erroneous('error', null);
         final VideoPlayerValue copy =
             original.copyWith(errorDescription: 'new error');
 

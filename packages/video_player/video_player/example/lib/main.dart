@@ -467,14 +467,25 @@ class _ExampleVideoState extends State<_ExampleVideo> {
             trailing: IconButton(
                 onPressed: _showDialog, icon: const Icon(Icons.edit)),
           ),
-          ElevatedButton(
-            onPressed: () {
-              _videoController.seekTo(
-                _videoController.value.buffered.last.end -
-                    const Duration(seconds: 5),
-              );
-            },
-            child: Text('buffer end'),
+          Wrap(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _videoController.seekTo(
+                    _videoController.value.buffered.last.end -
+                        const Duration(seconds: 5),
+                  );
+                },
+                child: Text('buffer end'),
+              ),
+              SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  _videoController.setPreferredQuality(640.0, 360.0);
+                },
+                child: Text('360p'),
+              ),
+            ],
           ),
           Wrap(
             children: [
@@ -485,8 +496,7 @@ class _ExampleVideoState extends State<_ExampleVideo> {
               Text(
                   'dropped: ${_videoController.value.playbackMetrics?.framesDropped}'),
               Text('vfpoRate: ${_videoController.value.playbackMetrics?.vfpo}'),
-              Text(
-                  'format: ${_videoController.value.playbackMetrics?.videoMimeType}'),
+              Text('format: ${_videoController.value.playbackMetrics?.height}'),
               Text(
                   'bandwidthData: ${_videoController.value.playbackMetrics?.meanBandWidth}'),
             ]
@@ -517,7 +527,7 @@ class _ExampleVideoState extends State<_ExampleVideo> {
       );
     } else if (widget.isStreaming) {
       _videoController = VideoPlayerController.network(
-        'https://0c6d038a-3309-416c-8331-7a5a3be3ce8b.selcdn.net/media/videos/f493d97b-de69-40a2-a506-3449728d0a5e/1080p_playlist.m3u8',
+        'https://video-cdn.the-hole.tv/episodes/45923f25-8996-4af3-a1c9-496d38837fbb/master.m3u8',
         // 'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8',
         formatHint: VideoFormat.hls,
         videoPlayerOptions: const VideoPlayerOptions(),

@@ -9,6 +9,7 @@ import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
@@ -343,13 +344,14 @@ final class VideoPlayer {
     exoPlayer.seekTo(location);
   }
 
-  void setPreferredVideoSize(int widht, int height) {
+  void setPreferredVideoSize(int width, int height) {
     TrackSelector trackSelector = exoPlayer.getTrackSelector();
     if (trackSelector instanceof DefaultTrackSelector) {
       DefaultTrackSelector defaultTrackSelector = (DefaultTrackSelector) trackSelector;
       DefaultTrackSelector.ParametersBuilder builder = defaultTrackSelector.getParameters().buildUpon();
+      Log.w("tagg", "setPreferredVideoSize " + width + "; " + height);
       defaultTrackSelector.setParameters(
-          builder.setMaxVideoSize(widht, height)
+          builder.setMaxVideoSize(width, height)
               .build()
       );
     }
