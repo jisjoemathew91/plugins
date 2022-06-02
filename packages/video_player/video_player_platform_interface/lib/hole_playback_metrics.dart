@@ -5,49 +5,49 @@ import 'package:flutter/foundation.dart';
 class HolePlaybackMetrics {
   /// Создаем экземпляр
   const HolePlaybackMetrics({
-    required this.videoMimeType,
-    required this.codec,
-    required this.height,
-    required this.framesDropped,
-    required this.frameDropRate,
-    required this.vfpo,
-    required this.meanBandWidth,
-    required this.audioMimeType,
-    required this.hz,
-    required this.channelCount,
+    this.videoMimeType,
+    this.codec,
+    this.height,
+    this.framesDropped,
+    this.frameDropRate,
+    this.vfpo,
+    this.meanBandWidth,
+    this.audioMimeType,
+    this.hz,
+    this.channelCount,
   });
 
   /// Video sample mime type, may be empty
-  final String videoMimeType;
+  final String? videoMimeType;
 
   /// Video codes
-  final String codec;
+  final String? codec;
 
   /// Video height
-  final int height;
+  final int? height;
 
   /// Total frames drop count
-  final int framesDropped;
+  final int? framesDropped;
 
   /// Frame drop rate
-  final double frameDropRate;
+  final double? frameDropRate;
 
   /// Video Frame Processing Offset.
   /// Метрика fps. Говорят, что стоит беспокоиться, если значение меньше 40000
   /// https://medium.com/google-exoplayer/improved-rendering-performance-operating-mediacodec-in-asynchronous-mode-and-asynchronous-buffer-3026207850b2
-  final int vfpo;
+  final int? vfpo;
 
   /// Mean network bandwidth based on transfer measurements, in bits per second
-  final int meanBandWidth;
+  final int? meanBandWidth;
 
   /// Audio sample mime type, may be empty
-  final String audioMimeType;
+  final String? audioMimeType;
 
   /// The audio sampling rate in Hz, may be -1
-  final int hz;
+  final int? hz;
 
   /// The number of audio channels, mat be -1
-  final int channelCount;
+  final int? channelCount;
 
   @override
   bool operator ==(Object other) {
