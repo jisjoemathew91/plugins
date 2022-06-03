@@ -14,7 +14,14 @@ import 'package:video_player_platform_interface/video_player_platform_interface.
 import 'src/closed_caption_file.dart';
 
 export 'package:video_player_platform_interface/video_player_platform_interface.dart'
-    show DurationRange, DataSourceType, VideoFormat, VideoPlayerOptions;
+    show
+        DurationRange,
+        DataSourceType,
+        VideoFormat,
+        VideoPlayerOptions,
+        BufferOptions,
+        BufferAndroidPlatformOptions,
+        BufferIosPlatformOptions;
 
 export 'src/closed_caption_file.dart';
 
@@ -224,14 +231,15 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// The name of the asset is given by the [dataSource] argument and must not be
   /// null. The [package] argument must be non-null when the asset comes from a
   /// package and null otherwise.
-  VideoPlayerController.asset(this.dataSource, {
+  VideoPlayerController.asset(
+    this.dataSource, {
     this.package,
     this.closedCaptionFile,
     this.videoPlayerOptions = const VideoPlayerOptions(),
     this.enableLog = false,
-  })
-      : dataSourceType = DataSourceType.asset,
+  })  : dataSourceType = DataSourceType.asset,
         formatHint = null,
+        bufferOptions = null,
         httpHeaders = const <String, String>{},
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -248,11 +256,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     this.dataSource, {
     this.formatHint,
     this.closedCaptionFile,
+    this.bufferOptions,
     this.videoPlayerOptions = const VideoPlayerOptions(),
     this.httpHeaders = const <String, String>{},
     this.enableLog = false,
-  })
-      : dataSourceType = DataSourceType.network,
+  })  : dataSourceType = DataSourceType.network,
         package = null,
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -260,15 +268,16 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   ///
   /// This will load the file from the file-URI given by:
   /// `'file://${file.path}'`.
-  VideoPlayerController.file(File file, {
+  VideoPlayerController.file(
+    File file, {
     this.closedCaptionFile,
     this.videoPlayerOptions = const VideoPlayerOptions(),
     this.enableLog = false,
-  })
-      : dataSource = 'file://${file.path}',
+  })  : dataSource = 'file://${file.path}',
         dataSourceType = DataSourceType.file,
         package = null,
         formatHint = null,
+        bufferOptions = null,
         httpHeaders = const <String, String>{},
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -277,17 +286,17 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// This will load the video from the input content-URI.
   /// This is supported on Android only.
   VideoPlayerController.contentUri(
-      Uri contentUri, {
-        this.closedCaptionFile,
-        this.videoPlayerOptions = const VideoPlayerOptions(),
-        this.enableLog = false,
-      })
-      : assert(defaultTargetPlatform == TargetPlatform.android,
+    Uri contentUri, {
+    this.closedCaptionFile,
+    this.videoPlayerOptions = const VideoPlayerOptions(),
+    this.enableLog = false,
+  })  : assert(defaultTargetPlatform == TargetPlatform.android,
             'VideoPlayerController.contentUri is only supported on Android.'),
         dataSource = contentUri.toString(),
         dataSourceType = DataSourceType.contentUri,
         package = null,
         formatHint = null,
+        bufferOptions = null,
         httpHeaders = const <String, String>{},
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -310,6 +319,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
 
   /// Provide additional configuration options (optional). Like setting the audio mode to mix
   final VideoPlayerOptions videoPlayerOptions;
+
+  /// Video player's options for buffering.
+  final BufferOptions? bufferOptions;
 
   /// Only set for [asset] videos. The package that the asset was loaded from.
   final String? package;
@@ -369,6 +381,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           httpHeaders: httpHeaders,
           duration: duration,
           enableLog: enableLog,
+          bufferOptions: bufferOptions,
         );
         break;
       case DataSourceType.file:

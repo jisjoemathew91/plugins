@@ -46,6 +46,7 @@
 @property(nonatomic) id timeObserverToken;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
+               forwardBufferDuration: (double)bufferDuration
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers;
 @end
 
@@ -63,7 +64,7 @@ static void *eventContext = &eventContext;
 
 - (instancetype)initWithAsset:(NSString *)asset frameUpdater:(FLTFrameUpdater *)frameUpdater {
   NSString *path = [[NSBundle mainBundle] pathForResource:asset ofType:nil];
-  return [self initWithURL:[NSURL fileURLWithPath:path] frameUpdater:frameUpdater httpHeaders:@{}];
+  return [self initWithURL:[NSURL fileURLWithPath:path] frameUpdater:frameUpdater forwardBufferDuration:0.0 httpHeaders:@{}];
 }
 
 - (void)addObservers:(AVPlayerItem *)item {
@@ -95,9 +96,9 @@ static void *eventContext = &eventContext;
          forKeyPath:@"playbackBufferFull"
             options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
             context:playbackBufferFullContext];
-        
+
     [self initPlayerPeriodicTimeObserver];
-    
+
   // Add an observer that will respond to itemDidPlayToEndTime
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(itemDidPlayToEndTime:)
@@ -112,24 +113,24 @@ static void *eventContext = &eventContext;
 
     CMTime period = CMTimeMakeWithSeconds(0.5, NSEC_PER_SEC);
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
-    
+
     self.timeObserverToken = [self.player addPeriodicTimeObserverForInterval:period queue:mainQueue usingBlock:^(CMTime time) {
-      
-        
+
+
       if(self->_isInitialized){
         AVPlayer *player = self.player;
         AVAsset *asset = player.currentItem.asset;
 
         CGSize size = player.currentItem.presentationSize;
         CGFloat height = size.height;
-          
+
           self->_eventSink(@{
               @"event" : @"playbackMetrics",
               @"framesDropped": [NSNumber numberWithInt:player.currentItem.accessLog.events.lastObject.numberOfDroppedVideoFrames],
               @"height": [NSNumber numberWithInt:height],
           });
       }
-        
+
     }];
 }
 
@@ -259,7 +260,8 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (instancetype)initWithURL:(NSURL *)url
-               frameUpdater:(FLTFrameUpdater *)frameUpdater
+                frameUpdater:(FLTFrameUpdater *)frameUpdater
+                forwardBufferDuration: (double)bufferDuration
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers {
   NSDictionary<NSString *, id> *options = nil;
   if ([headers count] != 0) {
@@ -267,9 +269,11 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   }
   AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:options];
   AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:urlAsset];
-    
-   
-    
+
+  if (bufferDuration != 0.0) {
+    item.preferredForwardBufferDuration = bufferDuration;
+  }
+
   [self log:[NSString stringWithFormat:@"Player created (url: '%@', headers: '%@')", url.absoluteString, headers]];
   return [self initWithPlayerItem:item frameUpdater:frameUpdater];
 }
@@ -700,8 +704,13 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     player.isLoggingEnabled = input.enableLog.boolValue;
     return [self onPlayerSetup:player frameUpdater:frameUpdater];
   } else if (input.uri) {
+    double forwardBufferDuration = 0.0;
+    if (input.bufferMessage != nil) {
+      forwardBufferDuration = input.bufferMessage.forwardBufferDuration.doubleValue;
+    }
     player = [[FLTVideoPlayer alloc] initWithURL:[NSURL URLWithString:input.uri]
                                     frameUpdater:frameUpdater
+                                    forwardBufferDuration: forwardBufferDuration
                                      httpHeaders:input.httpHeaders];
     if (input.duration.intValue > 0)
       player.startTime = input.duration.intValue;

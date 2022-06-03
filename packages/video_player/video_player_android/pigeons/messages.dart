@@ -43,12 +43,25 @@ class PositionMessage {
 }
 
 class CreateMessage {
-  CreateMessage({required this.httpHeaders});
+  CreateMessage({required this.httpHeaders, required this.bufferMessage});
   String? asset;
   String? uri;
   String? packageName;
   String? formatHint;
+  int? duration;
+  bool? enableLog;
   Map<String?, String?> httpHeaders;
+  BufferMessage? bufferMessage;
+}
+
+class BufferMessage {
+  BufferMessage();
+  int? minBufferMs;
+  int? maxBufferMs;
+  int? bufferForPlaybackMs;
+  int? bufferForPlaybackAfterRebufferMs;
+  int? backBufferDurationMs;
+  bool? retainBackBufferFromKeyframe;
 }
 
 class MixWithOthersMessage {
