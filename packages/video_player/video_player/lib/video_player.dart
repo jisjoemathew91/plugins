@@ -67,7 +67,8 @@ class VideoPlayerValue {
       : this(duration: Duration.zero, isInitialized: false);
 
   /// Returns an instance with the given [errorDescription].
-  VideoPlayerValue.erroneous(String errorDescription, String? holeErrorDescription)
+  VideoPlayerValue.erroneous(
+      String errorDescription, String? holeErrorDescription)
       : this(
             duration: Duration.zero,
             isInitialized: false,
@@ -720,6 +721,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   }
 
   bool get _isDisposedOrNotInitialized => _isDisposed || !value.isInitialized;
+
+  /// Sets preferred video stream quality
+  Future<void> setPreferredQuality(double width, double height) {
+    return _videoPlayerPlatform.setPreferredQuality(_textureId, width, height);
+  }
 }
 
 class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {

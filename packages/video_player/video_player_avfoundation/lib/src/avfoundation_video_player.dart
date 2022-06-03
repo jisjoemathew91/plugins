@@ -190,6 +190,15 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
     return _api.setMixWithOthers(MixWithOthersMessage(mixWithOthers: mixWithOthers));
   }
 
+  @override
+  Future<void> setPreferredQuality(int textureId, double width, double height) {
+    return _api.setPreferredQuality(QualityMessage(
+      textureId: textureId,
+      width: width,
+      height: height,
+    ));
+  }
+
   EventChannel _eventChannelFor(int textureId) {
     return EventChannel('flutter.io/videoPlayer/videoEvents$textureId');
   }

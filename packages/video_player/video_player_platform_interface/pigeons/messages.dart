@@ -44,6 +44,12 @@ class MixWithOthersMessage {
   bool mixWithOthers;
 }
 
+class QualityMessage {
+  int textureId;
+  double width;
+  double height;
+}
+
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')
 abstract class VideoPlayerApi {
   void initialize();
@@ -57,6 +63,7 @@ abstract class VideoPlayerApi {
   void seekTo(PositionMessage msg);
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
+  void setPreferredQuality(QualityMessage msg);
 }
 
 void configurePigeon(PigeonOptions opts) {

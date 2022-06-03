@@ -793,4 +793,15 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   }
 }
 
+- (void)setPreferredQuality:(nonnull FLTQualityMessage *)msg error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
+  FLTVideoPlayer *player = self.playersByTextureId[msg.textureId];
+  if (@available(iOS 11.0, *)) {
+    CGSize size = CGSizeMake(msg.width.floatValue, msg.height.floatValue);
+    player.player.currentItem.preferredMaximumResolution = size;
+  } else {
+    // doing nothing of earlier versions
+  }
+}
+
+
 @end
