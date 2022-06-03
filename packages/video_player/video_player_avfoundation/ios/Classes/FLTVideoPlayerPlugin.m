@@ -43,6 +43,7 @@
 @property(nonatomic, readonly) BOOL isInitialized;
 @property(assign, nonatomic) int startTime;
 @property(assign, nonatomic) BOOL isLoggingEnabled;
+@property(nonatomic) id timeObserverToken;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
                forwardBufferDuration: (double)bufferDuration
@@ -56,8 +57,11 @@ static void *durationContext = &durationContext;
 static void *playbackLikelyToKeepUpContext = &playbackLikelyToKeepUpContext;
 static void *playbackBufferEmptyContext = &playbackBufferEmptyContext;
 static void *playbackBufferFullContext = &playbackBufferFullContext;
+static void *eventContext = &eventContext;
 
 @implementation FLTVideoPlayer
+
+
 - (instancetype)initWithAsset:(NSString *)asset frameUpdater:(FLTFrameUpdater *)frameUpdater {
   NSString *path = [[NSBundle mainBundle] pathForResource:asset ofType:nil];
   return [self initWithURL:[NSURL fileURLWithPath:path] frameUpdater:frameUpdater forwardBufferDuration:0.0 httpHeaders:@{}];
@@ -93,6 +97,8 @@ static void *playbackBufferFullContext = &playbackBufferFullContext;
             options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
             context:playbackBufferFullContext];
 
+    [self initPlayerPeriodicTimeObserver];
+
   // Add an observer that will respond to itemDidPlayToEndTime
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(itemDidPlayToEndTime:)
@@ -101,6 +107,31 @@ static void *playbackBufferFullContext = &playbackBufferFullContext;
     
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemFailedToPlayToEndTime:) name:AVPlayerItemNewErrorLogEntryNotification object:item];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemFailedToPlayToEndTime:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:item];
+}
+
+-(void)initPlayerPeriodicTimeObserver{
+
+    CMTime period = CMTimeMakeWithSeconds(0.5, NSEC_PER_SEC);
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+
+    self.timeObserverToken = [self.player addPeriodicTimeObserverForInterval:period queue:mainQueue usingBlock:^(CMTime time) {
+
+
+      if(self->_isInitialized){
+        AVPlayer *player = self.player;
+        AVAsset *asset = player.currentItem.asset;
+
+        CGSize size = player.currentItem.presentationSize;
+        CGFloat height = size.height;
+
+          self->_eventSink(@{
+              @"event" : @"playbackMetrics",
+              @"framesDropped": [NSNumber numberWithInt:player.currentItem.accessLog.events.lastObject.numberOfDroppedVideoFrames],
+              @"height": [NSNumber numberWithInt:height],
+          });
+      }
+
+    }];
 }
 
 - (void)itemDidPlayToEndTime:(NSNotification *)notification {
@@ -576,6 +607,10 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
   [currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
   [currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
   [currentItem removeObserver:self forKeyPath:@"playbackBufferFull"];
+    if(self.timeObserverToken != nil){
+        [self.player removeTimeObserver:self.timeObserverToken];
+        self.timeObserverToken = nil;
+    }
 
   [self.player replaceCurrentItemWithPlayerItem:nil];
   [[NSNotificationCenter defaultCenter] removeObserver:self];

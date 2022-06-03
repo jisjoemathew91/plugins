@@ -131,24 +131,20 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
 
   @override
   Future<Duration> getPosition(int textureId) async {
-    final PositionMessage response =
-        await _api.position(TextureMessage(textureId: textureId));
+    final PositionMessage response = await _api.position(TextureMessage(textureId: textureId));
     return Duration(milliseconds: response.position);
   }
 
   @override
   Stream<VideoEvent> videoEventsFor(int textureId) {
-    return _eventChannelFor(textureId)
-        .receiveBroadcastStream()
-        .map((dynamic event) {
+    return _eventChannelFor(textureId).receiveBroadcastStream().map((dynamic event) {
       final Map<dynamic, dynamic> map = event as Map<dynamic, dynamic>;
       switch (map['event']) {
         case 'initialized':
           return VideoEvent(
             eventType: VideoEventType.initialized,
             duration: Duration(milliseconds: map['duration'] as int),
-            size: Size((map['width'] as num?)?.toDouble() ?? 0.0,
-                (map['height'] as num?)?.toDouble() ?? 0.0),
+            size: Size((map['width'] as num?)?.toDouble() ?? 0.0, (map['height'] as num?)?.toDouble() ?? 0.0),
           );
         case 'completed':
           return VideoEvent(
@@ -169,16 +165,16 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
           return VideoEvent(
             eventType: VideoEventType.playbackMetrics,
             playbackMetrics: HolePlaybackMetrics(
-              videoMimeType: map['videoMimeType']! as String,
-              codec: map['codec']! as String,
-              height: map['height']! as int,
-              framesDropped: map['framesDropped']! as int,
-              frameDropRate: map['frameDropRate']! as double,
-              vfpo: map['vfpo']! as int,
-              meanBandWidth: map['meanBandWidth']! as int,
-              audioMimeType: map['audioMimeType']! as String,
-              hz: map['hz']! as int,
-              channelCount: map['channelCount']! as int,
+              videoMimeType: map['videoMimeType'] as String?,
+              codec: map['codec'] as String?,
+              height: map['height'] as int?,
+              framesDropped: map['framesDropped'] as int?,
+              frameDropRate: map['frameDropRate'] as double?,
+              vfpo: map['vfpo'] as int?,
+              meanBandWidth: map['meanBandWidth'] as int?,
+              audioMimeType: map['audioMimeType'] as String?,
+              hz: map['hz'] as int?,
+              channelCount: map['channelCount'] as int?,
             ),
           );
         default:
@@ -194,8 +190,7 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
 
   @override
   Future<void> setMixWithOthers(bool mixWithOthers) {
-    return _api
-        .setMixWithOthers(MixWithOthersMessage(mixWithOthers: mixWithOthers));
+    return _api.setMixWithOthers(MixWithOthersMessage(mixWithOthers: mixWithOthers));
   }
 
   @override
@@ -211,8 +206,7 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
     return EventChannel('flutter.io/videoPlayer/videoEvents$textureId');
   }
 
-  static const Map<VideoFormat, String> _videoFormatStringMap =
-      <VideoFormat, String>{
+  static const Map<VideoFormat, String> _videoFormatStringMap = <VideoFormat, String>{
     VideoFormat.ss: 'ss',
     VideoFormat.hls: 'hls',
     VideoFormat.dash: 'dash',
