@@ -114,23 +114,29 @@ static void *eventContext = &eventContext;
     CMTime period = CMTimeMakeWithSeconds(0.5, NSEC_PER_SEC);
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
 
-    self.timeObserverToken = [self.player addPeriodicTimeObserverForInterval:period queue:mainQueue usingBlock:^(CMTime time) {
+    __weak FLTVideoPlayer *weakSelf = self;
+    weakSelf.timeObserverToken = [self.player addPeriodicTimeObserverForInterval:period queue:mainQueue usingBlock:^(CMTime time) {
 
+      FLTVideoPlayer *strongSelf = weakSelf;
+      if(strongSelf) {
+        
+        if(strongSelf->_isInitialized){
+          FlutterEventSink eventSink = strongSelf.eventSink;
+          if (!eventSink)
+            return;
+          AVPlayer *player = strongSelf.player;
+          AVAsset *asset = player.currentItem.asset;
 
-      if(self->_isInitialized){
-        AVPlayer *player = self.player;
-        AVAsset *asset = player.currentItem.asset;
-
-        CGSize size = player.currentItem.presentationSize;
-        CGFloat height = size.height;
-
-          self->_eventSink(@{
+          CGSize size = player.currentItem.presentationSize;
+          CGFloat height = size.height;
+          
+          eventSink(@{
               @"event" : @"playbackMetrics",
               @"framesDropped": [NSNumber numberWithInt:player.currentItem.accessLog.events.lastObject.numberOfDroppedVideoFrames],
               @"height": [NSNumber numberWithInt:height],
           });
+        }
       }
-
     }];
 }
 
