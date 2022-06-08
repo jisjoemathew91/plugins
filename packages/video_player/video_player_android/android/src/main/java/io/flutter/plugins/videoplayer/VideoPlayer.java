@@ -356,7 +356,6 @@ final class VideoPlayer {
     if (trackSelector instanceof DefaultTrackSelector) {
       DefaultTrackSelector defaultTrackSelector = (DefaultTrackSelector) trackSelector;
       DefaultTrackSelector.ParametersBuilder builder = defaultTrackSelector.getParameters().buildUpon();
-      Log.w("tagg", "setPreferredVideoSize " + width + "; " + height);
       defaultTrackSelector.setParameters(
           builder.setMaxVideoSize(preferredWidth, preferredHeight)
               .build()

@@ -233,10 +233,12 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
   public void setPreferredQuality(@NonNull Messages.QualityMessage msg) {
     VideoPlayer player = videoPlayers.get(msg.getTextureId());
 
-    player.setPreferredVideoSize(
-        (int) Math.round(msg.getWidth()),
-        (int) Math.round(msg.getHeight())
-    );
+    if (player != null) {
+      player.setPreferredVideoSize(
+          (int) Math.round(msg.getWidth()),
+          (int) Math.round(msg.getHeight())
+      );
+    }
   }
 
   private interface KeyForAssetFn {
